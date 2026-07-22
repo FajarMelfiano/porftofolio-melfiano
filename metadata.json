@@ -1,0 +1,6 @@
+{
+  "name": "Personal Portfolio CMS",
+  "description": "Comprehensive Personal Portfolio Website with Admin CMS, Analytics, Multi-Language, and Dynamic Content Management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
