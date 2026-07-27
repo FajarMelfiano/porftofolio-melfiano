@@ -19,7 +19,7 @@ export const WhatsAppFloatingButton: React.FC = () => {
       href={whatsappUrl}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-40 flex items-center space-x-2.5 px-4 py-3 rounded-sm bg-white text-black font-bold text-[10px] uppercase tracking-widest shadow-2xl border border-white/20 hover:bg-neutral-200 transition-all duration-300 font-mono"
+      className="fixed bottom-6 right-6 z-40 flex items-center space-x-2.5 px-4 py-3 rounded-[var(--radius)] bg-fg text-canvas font-bold text-[10px] uppercase tracking-widest shadow-2xl border border-fg/20 hover:bg-fg/90 transition-all duration-300 font-mono"
       title="Chat WhatsApp Direct"
     >
       <MessageSquare className="w-4 h-4" />

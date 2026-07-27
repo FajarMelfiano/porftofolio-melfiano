@@ -108,6 +108,15 @@ export interface Education {
   order: number;
 }
 
+export interface PlantTimelineEntry {
+  id: string;
+  date: string;
+  photoUrl: string;
+  description: { id: string; en: string };
+  week: number;
+  growthStage: 'seeding' | 'germination' | 'vegetative' | 'flowering' | 'fruiting' | 'harvest';
+}
+
 export interface Project {
   id: string;
   slug: string;
@@ -135,6 +144,9 @@ export interface Project {
   isFeatured: boolean;
   order: number;
   views: number;
+  projectType?: 'default' | 'plant-documentation';
+  plantTimeline?: PlantTimelineEntry[];
+  plantInfo?: { name: string; variety: string; plantDate: string; expectedHarvestDate: string };
 }
 
 export interface Certificate {

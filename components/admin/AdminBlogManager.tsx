@@ -3,212 +3,276 @@
 import React, { useState } from 'react';
 import { useDataContext } from '@/lib/data-context';
 import { BlogPost } from '@/lib/types';
-import { Plus, Edit2, Trash2, BookOpen, Check } from 'lucide-react';
+import { BookOpen, Eye, Heart } from 'lucide-react';
+import {
+  PanelHeader, Card, AddButton, Field, TextInput, NumberInput, Toggle,
+  Grid, FormSection, FormActions, ItemRow, EmptyState,
+  BilingualText, BilingualArea, TagsInput, useArmedDelete, DeleteConfirmBar
+} from './ui';
+
+const slugify = (s: string) =>
+  s.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+
+/** Rough estimate at 200 words per minute; the admin can override it. */
+const estimateReadTime = (text: string) =>
+  Math.max(1, Math.round(text.trim().split(/\s+/).filter(Boolean).length / 200));
+
+type BlogForm = Omit<BlogPost, 'id' | 'views' | 'likes' | 'commentsCount'>;
+
+const emptyPost = (): BlogForm => ({
+  slug: '',
+  title: { id: '', en: '' },
+  excerpt: { id: '', en: '' },
+  contentMarkdown: { id: '', en: '' },
+  coverImage: '',
+  category: '',
+  tags: [],
+  readTimeMinutes: 5,
+  publishedAt: new Date().toISOString().split('T')[0],
+  isPublished: true,
+  isDraft: false
+});
 
 export const AdminBlogManager: React.FC = () => {
   const { blogPosts, addBlogPost, updateBlogPost, deleteBlogPost } = useDataContext();
 
+  const [filter, setFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState<BlogForm>(emptyPost());
+  const set = <K extends keyof BlogForm>(k: K, v: BlogForm[K]) =>
+    setForm(f => ({ ...f, [k]: v }));
 
-  const [form, setForm] = useState({
-    titleID: '',
-    titleEN: '',
-    slug: '',
-    coverImage: 'https://picsum.photos/seed/new-blog/800/450',
-    category: 'Architecture',
-    tagsStr: 'Nextjs, React, Web',
-    excerptID: '',
-    excerptEN: '',
-    contentID: '',
-    contentEN: '',
-    readTimeMinutes: 5,
-    isPublished: true,
-    isDraft: false
-  });
+  const { armedId, trigger } = useArmedDelete(deleteBlogPost);
 
-  const handleStartAdd = () => {
+  const startAdd = () => {
     setEditingId(null);
+    setForm(emptyPost());
+    setIsEditing(true);
+  };
+
+  const startEdit = (p: BlogPost) => {
+    setEditingId(p.id);
     setForm({
-      titleID: '',
-      titleEN: '',
-      slug: '',
-      coverImage: 'https://picsum.photos/seed/new-blog/800/450',
-      category: 'Architecture',
-      tagsStr: 'Nextjs, React, Web',
-      excerptID: '',
-      excerptEN: '',
-      contentID: '',
-      contentEN: '',
-      readTimeMinutes: 5,
-      isPublished: true,
-      isDraft: false
+      slug: p.slug,
+      title: p.title,
+      excerpt: p.excerpt,
+      contentMarkdown: p.contentMarkdown,
+      coverImage: p.coverImage,
+      category: p.category,
+      tags: p.tags,
+      readTimeMinutes: p.readTimeMinutes,
+      publishedAt: p.publishedAt,
+      isPublished: p.isPublished,
+      isDraft: p.isDraft
     });
     setIsEditing(true);
   };
 
-  const handleStartEdit = (b: BlogPost) => {
-    setEditingId(b.id);
-    setForm({
-      titleID: b.title.id,
-      titleEN: b.title.en,
-      slug: b.slug,
-      coverImage: b.coverImage,
-      category: b.category,
-      tagsStr: b.tags.join(', '),
-      excerptID: b.excerpt.id,
-      excerptEN: b.excerpt.en,
-      contentID: b.contentMarkdown.id,
-      contentEN: b.contentMarkdown.en,
-      readTimeMinutes: b.readTimeMinutes,
-      isPublished: b.isPublished,
-      isDraft: b.isDraft
-    });
-    setIsEditing(true);
-  };
-
-  const handleSave = (e: React.FormEvent) => {
+  const save = (e: React.FormEvent) => {
     e.preventDefault();
-    const tagsArr = form.tagsStr.split(',').map(t => t.trim()).filter(Boolean);
-
-    if (editingId) {
-      updateBlogPost(editingId, {
-        title: { id: form.titleID, en: form.titleEN || form.titleID },
-        slug: form.slug || form.titleID.toLowerCase().replace(/\s+/g, '-'),
-        coverImage: form.coverImage,
-        category: form.category,
-        tags: tagsArr,
-        excerpt: { id: form.excerptID, en: form.excerptEN || form.excerptID },
-        contentMarkdown: { id: form.contentID, en: form.contentEN || form.contentID },
-        readTimeMinutes: form.readTimeMinutes,
-        isPublished: form.isPublished,
-        isDraft: form.isDraft
-      });
-    } else {
-      addBlogPost({
-        title: { id: form.titleID, en: form.titleEN || form.titleID },
-        slug: form.slug || form.titleID.toLowerCase().replace(/\s+/g, '-'),
-        coverImage: form.coverImage,
-        category: form.category,
-        tags: tagsArr,
-        excerpt: { id: form.excerptID, en: form.excerptEN || form.excerptID },
-        contentMarkdown: { id: form.contentID, en: form.contentEN || form.contentID },
-        readTimeMinutes: form.readTimeMinutes,
-        publishedAt: new Date().toISOString().split('T')[0],
-        isPublished: form.isPublished,
-        isDraft: form.isDraft
-      });
-    }
-
+    const payload: BlogForm = {
+      ...form,
+      slug: form.slug.trim() || slugify(form.title.id),
+      title: { id: form.title.id, en: form.title.en || form.title.id },
+      excerpt: { id: form.excerpt.id, en: form.excerpt.en || form.excerpt.id },
+      contentMarkdown: {
+        id: form.contentMarkdown.id,
+        en: form.contentMarkdown.en || form.contentMarkdown.id
+      },
+      // A draft is never publicly visible, whatever the publish switch says.
+      isPublished: form.isDraft ? false : form.isPublished
+    };
+    if (editingId) updateBlogPost(editingId, payload);
+    else addBlogPost(payload);
     setIsEditing(false);
   };
 
+  const visible = blogPosts.filter(p =>
+    filter === 'published' ? p.isPublished && !p.isDraft : filter === 'draft' ? p.isDraft : true
+  );
+  const draftCount = blogPosts.filter(p => p.isDraft).length;
+  const liveCount = blogPosts.filter(p => p.isPublished && !p.isDraft).length;
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-            <BookOpen className="w-5 h-5 text-blue-500" />
-            <span>Kelola Artikel & Blog Teknis</span>
-          </h2>
-          <p className="text-xs text-slate-500">Tulis, jadwalkan, atau publikasikan artikel panduan dan wawasan teknis.</p>
-        </div>
+      <PanelHeader
+        icon={<BookOpen className="w-5 h-5" />}
+        title="Kelola Artikel & Blog"
+        subtitle="Tulis artikel dua bahasa dalam format Markdown, atur status terbit dan draf."
+        action={<AddButton onClick={startAdd} label="Tulis Artikel" />}
+      />
 
-        <button
-          onClick={handleStartAdd}
-          className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs flex items-center space-x-2 shadow-md hover:bg-blue-700"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Tulis Artikel Baru</span>
-        </button>
-      </div>
+      {!isEditing && (
+        <div className="flex items-center gap-2 text-xs">
+          {([
+            { id: 'all', label: `Semua (${blogPosts.length})` },
+            { id: 'published', label: `Terbit (${liveCount})` },
+            { id: 'draft', label: `Draf (${draftCount})` }
+          ] as const).map(f => (
+            <button
+              key={f.id}
+              onClick={() => setFilter(f.id)}
+              className={`px-3.5 py-2 rounded-xl font-bold transition ${
+                filter === f.id
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {isEditing ? (
-        <form onSubmit={handleSave} className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4 text-xs">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Judul Artikel (ID) *</label>
-              <input
-                type="text"
+        <Card>
+          <form onSubmit={save} className="space-y-5 text-xs">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+              {editingId ? 'Ubah Artikel' : 'Artikel Baru'}
+            </h3>
+
+            <FormSection title="Judul & Ringkasan">
+              <BilingualText
+                label="Judul Artikel"
                 required
-                value={form.titleID}
-                onChange={e => setForm({ ...form, titleID: e.target.value })}
-                className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+                value={form.title}
+                onChange={v => set('title', v)}
               />
-            </div>
-
-            <div>
-              <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Kategori</label>
-              <input
-                type="text"
-                value={form.category}
-                onChange={e => setForm({ ...form, category: e.target.value })}
-                className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
+              <Grid>
+                <Field label="Slug URL" hint="Kosongkan untuk dibuat otomatis dari judul.">
+                  <TextInput
+                    value={form.slug}
+                    onChange={v => set('slug', v)}
+                    placeholder={form.title.id ? slugify(form.title.id) : 'judul-artikel'}
+                  />
+                </Field>
+                <Field label="Kategori" required>
+                  <TextInput
+                    required
+                    value={form.category}
+                    onChange={v => set('category', v)}
+                    placeholder="Engineering"
+                  />
+                </Field>
+              </Grid>
+              <BilingualArea
+                label="Ringkasan (Excerpt)"
+                rows={2}
+                value={form.excerpt}
+                onChange={v => set('excerpt', v)}
               />
-            </div>
-          </div>
+            </FormSection>
 
-          <div>
-            <label className="font-bold text-slate-700 dark:text-slate-300 block mb-1">Konten Markdown (ID) *</label>
-            <textarea
-              rows={8}
-              required
-              value={form.contentID}
-              onChange={e => setForm({ ...form, contentID: e.target.value })}
-              className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-mono"
-            />
-          </div>
+            <FormSection title="Isi Artikel (Markdown)">
+              <p className="text-[11px] text-slate-500">
+                Mendukung heading, daftar, tautan, tabel, dan blok kode. HTML mentah tidak
+                dirender demi keamanan.
+              </p>
+              <BilingualArea
+                label="Konten"
+                rows={12}
+                mono
+                required
+                value={form.contentMarkdown}
+                onChange={v => set('contentMarkdown', v)}
+              />
+            </FormSection>
 
-          <div className="flex items-center space-x-4 pt-2">
-            <button
-              type="submit"
-              className="px-5 py-2.5 rounded-xl bg-emerald-600 text-white font-bold flex items-center space-x-1.5"
-            >
-              <Check className="w-4 h-4" />
-              <span>Simpan Artikel</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsEditing(false)}
-              className="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200 font-bold"
-            >
-              Batal
-            </button>
-          </div>
-        </form>
+            <FormSection title="Media & Metadata">
+              <Field label="URL Gambar Sampul" required>
+                <TextInput required value={form.coverImage} onChange={v => set('coverImage', v)} />
+              </Field>
+              {form.coverImage && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={form.coverImage}
+                  alt="Pratinjau sampul"
+                  className="w-full max-w-xs h-32 object-cover rounded-xl border border-slate-200 dark:border-slate-700"
+                />
+              )}
+              <Field label="Tag" hint="Pisahkan dengan koma.">
+                <TagsInput value={form.tags} onChange={v => set('tags', v)} />
+              </Field>
+              <Grid>
+                <Field
+                  label="Estimasi Waktu Baca (menit)"
+                  hint={`Perkiraan dari isi artikel: ${estimateReadTime(
+                    form.contentMarkdown.id
+                  )} menit.`}
+                >
+                  <NumberInput
+                    min={1}
+                    value={form.readTimeMinutes}
+                    onChange={v => set('readTimeMinutes', v)}
+                  />
+                </Field>
+                <Field label="Tanggal Terbit">
+                  <TextInput
+                    type="date"
+                    value={form.publishedAt}
+                    onChange={v => set('publishedAt', v)}
+                  />
+                </Field>
+              </Grid>
+            </FormSection>
+
+            <FormSection title="Status Publikasi">
+              <Grid>
+                <Toggle
+                  label="Terbitkan artikel"
+                  hint="Hanya artikel terbit yang muncul di situs publik."
+                  checked={form.isPublished}
+                  onChange={v => set('isPublished', v)}
+                />
+                <Toggle
+                  label="Simpan sebagai draf"
+                  hint="Draf selalu disembunyikan, meski tombol terbit aktif."
+                  checked={form.isDraft}
+                  onChange={v => set('isDraft', v)}
+                />
+              </Grid>
+            </FormSection>
+
+            <FormActions onCancel={() => setIsEditing(false)} saveLabel="Simpan Artikel" />
+          </form>
+        </Card>
       ) : (
         <div className="space-y-3">
-          {blogPosts.map((post) => (
-            <div
-              key={post.id}
-              className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs space-x-4 shadow-sm"
-            >
-              <div className="flex items-center space-x-3">
-                <img src={post.coverImage} alt={post.title.id} className="w-12 h-12 rounded-xl object-cover" />
-                <div>
-                  <h4 className="font-bold text-slate-900 dark:text-white text-sm">{post.title.id}</h4>
-                  <p className="text-slate-500">{post.category} • {post.views} Views • {post.likes} Likes</p>
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => handleStartEdit(post)}
-                  className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
-                >
-                  <Edit2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => {
-                    if (confirm('Hapus artikel ini?')) deleteBlogPost(post.id);
-                  }}
-                  className="p-2 rounded-lg bg-rose-50 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+          {visible.map(p => (
+            <div key={p.id} className="space-y-1">
+              <ItemRow
+                thumbnail={p.coverImage}
+                title={p.title.id}
+                meta={`${p.category} • ${p.publishedAt} • ${p.readTimeMinutes} menit baca`}
+                badges={[
+                  p.isDraft
+                    ? { label: 'Draf', tone: 'warn' as const }
+                    : p.isPublished
+                    ? { label: 'Terbit', tone: 'ok' as const }
+                    : { label: 'Belum terbit', tone: 'muted' as const },
+                  { label: `${p.views} views`, tone: 'muted' as const },
+                  { label: `${p.likes} suka`, tone: 'muted' as const }
+                ]}
+                extraActions={
+                  <span className="hidden sm:flex items-center gap-3 text-slate-400 px-2">
+                    <span className="flex items-center gap-1">
+                      <Eye className="w-3.5 h-3.5" />
+                      {p.views}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Heart className="w-3.5 h-3.5" />
+                      {p.likes}
+                    </span>
+                  </span>
+                }
+                onEdit={() => startEdit(p)}
+                onDelete={() => trigger(p.id)}
+              />
+              {armedId === p.id && <DeleteConfirmBar onCancel={() => trigger('')} />}
             </div>
           ))}
+          {visible.length === 0 && <EmptyState message="Tidak ada artikel pada filter ini." />}
         </div>
       )}
     </div>

@@ -2,7 +2,13 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
-import { db } from './firebase';
+import {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  type User as FirebaseUser
+} from 'firebase/auth';
+import { db, auth } from './firebase';
 import {
   Language,
   ProfileInfo,
@@ -67,8 +73,9 @@ interface DataContextType {
   setLanguage: (lang: Language) => void;
   isAdminLoggedIn: boolean;
   adminUser: AdminUser | null;
-  loginAdmin: (email: string, pass: string) => boolean;
-  logoutAdmin: () => void;
+  isAuthResolving: boolean;
+  loginAdmin: (email: string, pass: string) => Promise<{ ok: boolean; error?: string }>;
+  logoutAdmin: () => Promise<void>;
   
   // Entities
   profile: ProfileInfo;
@@ -78,6 +85,10 @@ interface DataContextType {
   updateHeroConfig: (data: Partial<HeroConfig>) => void;
   
   skillCategories: SkillCategory[];
+  addSkillCategory: (cat: Omit<SkillCategory, 'id'>) => void;
+  updateSkillCategory: (id: string, cat: Partial<SkillCategory>) => void;
+  deleteSkillCategory: (id: string) => void;
+
   skills: Skill[];
   addSkill: (skill: Omit<Skill, 'id'>) => void;
   updateSkill: (id: string, skill: Partial<Skill>) => void;
@@ -140,13 +151,16 @@ interface DataContextType {
   updateBlogPost: (id: string, post: Partial<BlogPost>) => void;
   deleteBlogPost: (id: string) => void;
   incrementBlogLike: (id: string) => void;
+  incrementBlogView: (id: string) => void;
   
   gallery: GalleryItem[];
   addGalleryItem: (item: Omit<GalleryItem, 'id'>) => void;
+  updateGalleryItem: (id: string, item: Partial<GalleryItem>) => void;
   deleteGalleryItem: (id: string) => void;
-  
+
   cvVersions: CVVersion[];
   addCVVersion: (cv: Omit<CVVersion, 'id' | 'downloadCount'>) => void;
+  updateCVVersion: (id: string, cv: Partial<CVVersion>) => void;
   deleteCVVersion: (id: string) => void;
   setActiveCV: (id: string) => void;
   incrementCVDownload: (id: string) => void;
@@ -158,6 +172,8 @@ interface DataContextType {
   
   subscribers: Subscriber[];
   addSubscriber: (email: string) => boolean;
+  updateSubscriber: (id: string, sub: Partial<Subscriber>) => void;
+  deleteSubscriber: (id: string) => void;
   
   themeSettings: ThemeSettings;
   updateThemeSettings: (settings: Partial<ThemeSettings>) => void;
@@ -173,6 +189,7 @@ interface DataContextType {
   
   auditLogs: AuditLog[];
   addAuditLog: (action: string, module: string, details: string) => void;
+  clearAuditLogs: () => void;
   
   analytics: AnalyticsSummary;
   
@@ -185,6 +202,7 @@ interface DataContextType {
   isCommandPaletteOpen: boolean;
   setIsCommandPaletteOpen: (open: boolean) => void;
   isDarkMode: boolean;
+  setIsDarkMode: (dark: boolean) => void;
   toggleDarkMode: () => void;
 }
 
@@ -192,14 +210,59 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 
 const LOCAL_STORAGE_KEY = 'PORTFOLIO_CMS_DATA_V1';
 
+/**
+ * Bump this whenever initial-data.ts changes in a way that must override a
+ * cached copy. Without it a snapshot saved under the old seed keeps winning
+ * over the new one forever — the page renders the new data, then the restore
+ * effect silently replaces it with the stale cache a tick later.
+ */
+const DATA_VERSION = 2;
+// Must match the key read by the pre-paint theme script in app/layout.tsx.
+const THEME_STORAGE_KEY = 'PORTFOLIO_CMS_THEME';
+
+const toAdminUser = (user: FirebaseUser): AdminUser => ({
+  id: user.uid,
+  name: user.displayName || user.email || 'Administrator',
+  email: user.email || '',
+  role: 'super_admin',
+  avatar: user.photoURL || '',
+  twoFactorEnabled: false,
+  lastLogin: user.metadata.lastSignInTime || new Date().toISOString()
+});
+
+/** Turns a Firebase auth error code into something an admin can act on. */
+const authErrorMessage = (code: string): string => {
+  switch (code) {
+    case 'auth/invalid-email':
+      return 'Format email tidak valid.';
+    case 'auth/invalid-credential':
+    case 'auth/wrong-password':
+    case 'auth/user-not-found':
+      return 'Email atau kata sandi salah.';
+    case 'auth/user-disabled':
+      return 'Akun ini dinonaktifkan.';
+    case 'auth/too-many-requests':
+      return 'Terlalu banyak percobaan gagal. Coba lagi beberapa saat lagi.';
+    case 'auth/network-request-failed':
+      return 'Gagal terhubung ke server autentikasi. Periksa koneksi Anda.';
+    case 'auth/operation-not-allowed':
+      return 'Metode Email/Password belum diaktifkan di konsol Firebase.';
+    default:
+      return 'Gagal masuk. Silakan coba lagi.';
+  }
+};
+
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [language, setLanguage] = useState<Language>('id');
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState<boolean>(false);
   const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
+  // True until Firebase reports the restored session, so the login form isn't
+  // flashed at an already-signed-in admin on every page load.
+  const [isAuthResolving, setIsAuthResolving] = useState<boolean>(true);
   
   const [profile, setProfile] = useState<ProfileInfo>(initialProfile);
   const [heroConfig, setHeroConfig] = useState<HeroConfig>(initialHeroConfig);
-  const [skillCategories] = useState<SkillCategory[]>(initialSkillCategories);
+  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>(initialSkillCategories);
   const [skills, setSkills] = useState<Skill[]>(initialSkills);
   const [experiences, setExperiences] = useState<Experience[]>(initialExperiences);
   const [educations, setEducations] = useState<Education[]>(initialEducations);
@@ -226,41 +289,112 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
 
-  // Load from local storage on mounted
+  // Guards the save effect: without it, the effect fires on mount with the
+  // seed data and overwrites saved data before the async load finishes.
+  const [isHydrated, setIsHydrated] = useState<boolean>(false);
+
+  // Restore persisted state on mount
   useEffect(() => {
+    let hadLocalSnapshot = false;
+    let hadStaleSnapshot = false;
+
     const timer = setTimeout(async () => {
       try {
-        // Try fetching from Firestore first
-        const docRef = doc(db, 'portfolio', 'profile');
-        const docSnap = await getDoc(docRef);
-        
-        if (docSnap.exists()) {
-            setProfile(docSnap.data() as ProfileInfo);
-        } else {
-            // Seed
-            await setDoc(docRef, initialProfile);
-            setProfile(initialProfile);
-        }
-        
-        const adminSession = localStorage.getItem('PORTFOLIO_CMS_ADMIN_SESSION');
-        if (adminSession) {
-          setAdminUser(JSON.parse(adminSession));
-          setIsAdminLoggedIn(true);
+        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+        const parsed = saved ? JSON.parse(saved) : null;
+
+        if (parsed && parsed.__version !== DATA_VERSION) {
+          // Snapshot predates the current seed. Discard it rather than let it
+          // shadow the new content, and remember it existed so the Firestore
+          // step below doesn't resurrect an equally stale profile.
+          localStorage.removeItem(LOCAL_STORAGE_KEY);
+          hadStaleSnapshot = true;
+        } else if (parsed) {
+          hadLocalSnapshot = true;
+          // Each entity is restored only when present, so a backup written by
+          // an older build never blanks out entities it didn't know about.
+          if (parsed.profile) setProfile(parsed.profile);
+          if (parsed.heroConfig) setHeroConfig(parsed.heroConfig);
+          if (parsed.skillCategories) setSkillCategories(parsed.skillCategories);
+          if (parsed.skills) setSkills(parsed.skills);
+          if (parsed.experiences) setExperiences(parsed.experiences);
+          if (parsed.educations) setEducations(parsed.educations);
+          if (parsed.projects) setProjects(parsed.projects);
+          if (parsed.certificates) setCertificates(parsed.certificates);
+          if (parsed.achievements) setAchievements(parsed.achievements);
+          if (parsed.organizations) setOrganizations(parsed.organizations);
+          if (parsed.trainings) setTrainings(parsed.trainings);
+          if (parsed.publications) setPublications(parsed.publications);
+          if (parsed.testimonials) setTestimonials(parsed.testimonials);
+          if (parsed.services) setServices(parsed.services);
+          if (parsed.blogPosts) setBlogPosts(parsed.blogPosts);
+          if (parsed.gallery) setGallery(parsed.gallery);
+          if (parsed.cvVersions) setCvVersions(parsed.cvVersions);
+          if (parsed.messages) setMessages(parsed.messages);
+          if (parsed.subscribers) setSubscribers(parsed.subscribers);
+          if (parsed.themeSettings) setThemeSettings(parsed.themeSettings);
+          if (parsed.seoSettings) setSeoSettings(parsed.seoSettings);
+          if (parsed.systemSettings) setSystemSettings(parsed.systemSettings);
+          if (parsed.pageSections) setPageSections(parsed.pageSections);
+          if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
+          if (parsed.analytics) setAnalytics(parsed.analytics);
         }
       } catch (e) {
-        console.error('Failed to load data', e);
+        console.error('Failed to restore local data', e);
       }
+
+      // Firestore currently stores only the profile document, so it can't be
+      // the source of truth for the site. It is used as a first-run fallback
+      // only: pulling it in on every load would reintroduce the same bug the
+      // version check above fixes, just from a remote stale copy instead.
+      if (!hadLocalSnapshot && !hadStaleSnapshot) {
+        try {
+          const docRef = doc(db, 'portfolio', 'profile');
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            setProfile(docSnap.data() as ProfileInfo);
+          } else {
+            await setDoc(docRef, initialProfile);
+          }
+        } catch (e) {
+          // Security rules deny unauthenticated access, which is expected —
+          // the seed data already rendered, so there is nothing to recover.
+          console.debug('Firestore profile unavailable, using local seed', e);
+        }
+      }
+
+      setIsHydrated(true);
     }, 0);
 
     return () => clearTimeout(timer);
   }, []);
 
+  // Firebase owns the session — it persists and restores it across reloads,
+  // so there is no admin session in localStorage to trust or forge.
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user: FirebaseUser | null) => {
+      if (user) {
+        setAdminUser(toAdminUser(user));
+        setIsAdminLoggedIn(true);
+      } else {
+        setAdminUser(null);
+        setIsAdminLoggedIn(false);
+      }
+      setIsAuthResolving(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
   // Save to local storage on changes
   useEffect(() => {
+    if (!isHydrated) return;
     try {
       const dataToSave = {
+        __version: DATA_VERSION,
         profile,
         heroConfig,
+        skillCategories,
         skills,
         experiences,
         educations,
@@ -281,33 +415,53 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         seoSettings,
         systemSettings,
         pageSections,
-        auditLogs
+        auditLogs,
+        analytics,
       };
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
     } catch (e) {
       console.error('Failed to save to local storage', e);
     }
   }, [
-    profile, heroConfig, skills, experiences, educations, projects,
+    isHydrated,
+    profile, heroConfig, skillCategories, skills, experiences, educations, projects,
     certificates, achievements, organizations, trainings, publications,
     testimonials, services, blogPosts, gallery, cvVersions, messages,
-    subscribers, themeSettings, seoSettings, systemSettings, pageSections, auditLogs
+    subscribers, themeSettings, seoSettings, systemSettings, pageSections, auditLogs, analytics
   ]);
+
+  // Adopt whatever the pre-paint script in the layout already applied, so the
+  // toggle icon matches the theme actually on screen.
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsDarkMode(document.documentElement.classList.contains('dark'));
+  }, []);
 
   // Handle dark mode toggle
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    document.documentElement.classList.toggle('dark', isDarkMode);
+    document.documentElement.style.colorScheme = isDarkMode ? 'dark' : 'light';
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, isDarkMode ? 'dark' : 'light');
+    } catch {
+      // Private-mode storage failures shouldn't break the toggle.
     }
   }, [isDarkMode]);
 
-  const toggleDarkMode = () => setIsDarkMode(prev => !prev);
+  // The navbar toggle and the admin Theme panel must not fight each other:
+  // both write the same `themeSettings.mode`, which is the single source of
+  // truth. Without this the toggle would be undone on the next page load.
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => {
+      const next = !prev;
+      setThemeSettings(current => ({ ...current, mode: next ? 'dark' : 'light' }));
+      return next;
+    });
+  };
 
   const addAuditLog = (action: string, module: string, details: string) => {
     const newLog: AuditLog = {
-      id: `log-${Date.now()}`,
+      id: `log-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       adminEmail: adminUser?.email || 'admin@portfolio.local',
       action,
       module,
@@ -318,31 +472,27 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuditLogs(prev => [newLog, ...prev]);
   };
 
-  const loginAdmin = (email: string, pass: string): boolean => {
-    // Default admin credentials or environment check
-    if ((email === 'oqiifebriansyah@gmail.com' || email === 'admin@portfolio.com' || email === 'admin') && pass.length >= 4) {
-      const user: AdminUser = {
-        id: 'usr-admin-1',
-        name: 'Oqii Febriansyah (Super Admin)',
-        email,
-        role: 'super_admin',
-        avatar: 'https://picsum.photos/seed/oqii-avatar/200/200',
-        twoFactorEnabled: true,
-        lastLogin: new Date().toISOString()
-      };
-      setAdminUser(user);
-      setIsAdminLoggedIn(true);
-      localStorage.setItem('PORTFOLIO_CMS_ADMIN_SESSION', JSON.stringify(user));
+  const loginAdmin = async (email: string, pass: string): Promise<{ ok: boolean; error?: string }> => {
+    try {
+      // Firebase verifies the credential; onAuthStateChanged sets the session.
+      await signInWithEmailAndPassword(auth, email.trim(), pass);
       addAuditLog('LOGIN_SUCCESS', 'Authentication', `Admin logged in successfully (${email})`);
-      return true;
+      return { ok: true };
+    } catch (e) {
+      const code = (e as { code?: string })?.code || '';
+      addAuditLog('LOGIN_FAILED', 'Authentication', `Failed login attempt (${email})`);
+      return { ok: false, error: authErrorMessage(code) };
     }
-    return false;
   };
 
-  const logoutAdmin = () => {
+  const logoutAdmin = async () => {
     addAuditLog('LOGOUT', 'Authentication', 'Admin logged out');
-    setIsAdminLoggedIn(false);
-    setAdminUser(null);
+    try {
+      await signOut(auth);
+    } catch (e) {
+      console.error('Failed to sign out', e);
+    }
+    // Clear any leftover session from the previous localStorage-based login.
     localStorage.removeItem('PORTFOLIO_CMS_ADMIN_SESSION');
   };
 
@@ -363,8 +513,25 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     addAuditLog('UPDATE_HERO', 'Hero Section', 'Hero config updated');
   };
 
+  const addSkillCategory = (cat: Omit<SkillCategory, 'id'>) => {
+    setSkillCategories(prev => [...prev, { ...cat, id: `cat-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` }]);
+    addAuditLog('CREATE_SKILL_CATEGORY', 'Skills', `Added category: ${cat.name.id}`);
+  };
+
+  const updateSkillCategory = (id: string, cat: Partial<SkillCategory>) => {
+    setSkillCategories(prev => prev.map(c => (c.id === id ? { ...c, ...cat } : c)));
+    addAuditLog('UPDATE_SKILL_CATEGORY', 'Skills', `Updated category ID: ${id}`);
+  };
+
+  const deleteSkillCategory = (id: string) => {
+    setSkillCategories(prev => prev.filter(c => c.id !== id));
+    // Skills keep their categoryId; the UI shows them as uncategorised rather
+    // than deleting a skill the admin didn't ask to remove.
+    addAuditLog('DELETE_SKILL_CATEGORY', 'Skills', `Deleted category ID: ${id}`);
+  };
+
   const addSkill = (skill: Omit<Skill, 'id'>) => {
-    const newSkill: Skill = { ...skill, id: `sk-${Date.now()}` };
+    const newSkill: Skill = { ...skill, id: `sk-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setSkills(prev => [...prev, newSkill]);
     addAuditLog('CREATE_SKILL', 'Skills', `Added skill: ${skill.name}`);
   };
@@ -380,7 +547,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addExperience = (exp: Omit<Experience, 'id'>) => {
-    const newExp: Experience = { ...exp, id: `exp-${Date.now()}` };
+    const newExp: Experience = { ...exp, id: `exp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setExperiences(prev => [newExp, ...prev]);
     addAuditLog('CREATE_EXP', 'Experience', `Added experience at ${exp.companyName}`);
   };
@@ -396,7 +563,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addEducation = (edu: Omit<Education, 'id'>) => {
-    const newEdu: Education = { ...edu, id: `edu-${Date.now()}` };
+    const newEdu: Education = { ...edu, id: `edu-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setEducations(prev => [newEdu, ...prev]);
     addAuditLog('CREATE_EDU', 'Education', `Added education: ${edu.institutionName}`);
   };
@@ -412,7 +579,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addProject = (proj: Omit<Project, 'id' | 'views'>) => {
-    const newProj: Project = { ...proj, id: `proj-${Date.now()}`, views: 0 };
+    const newProj: Project = { ...proj, id: `proj-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, views: 0 };
     setProjects(prev => [newProj, ...prev]);
     addAuditLog('CREATE_PROJECT', 'Projects', `Created project: ${proj.title}`);
   };
@@ -432,7 +599,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addCertificate = (cert: Omit<Certificate, 'id'>) => {
-    const newCert: Certificate = { ...cert, id: `cert-${Date.now()}` };
+    const newCert: Certificate = { ...cert, id: `cert-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setCertificates(prev => [newCert, ...prev]);
     addAuditLog('CREATE_CERT', 'Certificates', `Added certificate: ${cert.title}`);
   };
@@ -448,7 +615,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addAchievement = (ach: Omit<Achievement, 'id'>) => {
-    const newAch: Achievement = { ...ach, id: `ach-${Date.now()}` };
+    const newAch: Achievement = { ...ach, id: `ach-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setAchievements(prev => [newAch, ...prev]);
     addAuditLog('CREATE_ACHIEVEMENT', 'Achievements', 'Added new achievement');
   };
@@ -464,7 +631,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addOrganization = (org: Omit<Organization, 'id'>) => {
-    const newOrg: Organization = { ...org, id: `org-${Date.now()}` };
+    const newOrg: Organization = { ...org, id: `org-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setOrganizations(prev => [newOrg, ...prev]);
     addAuditLog('CREATE_ORG', 'Organizations', `Added organization: ${org.organizationName}`);
   };
@@ -480,7 +647,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addTraining = (trn: Omit<Training, 'id'>) => {
-    const newTrn: Training = { ...trn, id: `trn-${Date.now()}` };
+    const newTrn: Training = { ...trn, id: `trn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setTrainings(prev => [newTrn, ...prev]);
     addAuditLog('CREATE_TRAINING', 'Trainings', `Added training: ${trn.trainingName}`);
   };
@@ -496,7 +663,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addPublication = (pub: Omit<Publication, 'id'>) => {
-    const newPub: Publication = { ...pub, id: `pub-${Date.now()}` };
+    const newPub: Publication = { ...pub, id: `pub-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setPublications(prev => [newPub, ...prev]);
     addAuditLog('CREATE_PUB', 'Publications', `Added publication: ${pub.title}`);
   };
@@ -512,7 +679,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addTestimonial = (test: Omit<Testimonial, 'id' | 'isApproved'>) => {
-    const newTest: Testimonial = { ...test, id: `test-${Date.now()}`, isApproved: false };
+    const newTest: Testimonial = { ...test, id: `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, isApproved: false };
     setTestimonials(prev => [newTest, ...prev]);
   };
 
@@ -532,7 +699,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addService = (srv: Omit<Service, 'id'>) => {
-    const newSrv: Service = { ...srv, id: `srv-${Date.now()}` };
+    const newSrv: Service = { ...srv, id: `srv-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setServices(prev => [...prev, newSrv]);
     addAuditLog('CREATE_SERVICE', 'Services', 'Added service');
   };
@@ -548,7 +715,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addBlogPost = (post: Omit<BlogPost, 'id' | 'views' | 'likes' | 'commentsCount'>) => {
-    const newPost: BlogPost = { ...post, id: `post-${Date.now()}`, views: 0, likes: 0, commentsCount: 0 };
+    const newPost: BlogPost = { ...post, id: `post-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, views: 0, likes: 0, commentsCount: 0 };
     setBlogPosts(prev => [newPost, ...prev]);
     addAuditLog('CREATE_BLOG', 'Blog', 'Created blog post');
   };
@@ -567,10 +734,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setBlogPosts(prev => prev.map(p => p.id === id ? { ...p, likes: p.likes + 1 } : p));
   };
 
+  const incrementBlogView = (id: string) => {
+    setBlogPosts(prev => prev.map(p => p.id === id ? { ...p, views: p.views + 1 } : p));
+  };
+
   const addGalleryItem = (item: Omit<GalleryItem, 'id'>) => {
-    const newItem: GalleryItem = { ...item, id: `gal-${Date.now()}` };
+    const newItem: GalleryItem = { ...item, id: `gal-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
     setGallery(prev => [newItem, ...prev]);
     addAuditLog('CREATE_GALLERY', 'Gallery', 'Added gallery item');
+  };
+
+  const updateGalleryItem = (id: string, item: Partial<GalleryItem>) => {
+    setGallery(prev => prev.map(g => (g.id === id ? { ...g, ...item } : g)));
+    addAuditLog('UPDATE_GALLERY', 'Gallery', `Updated gallery item ID: ${id}`);
   };
 
   const deleteGalleryItem = (id: string) => {
@@ -579,9 +755,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addCVVersion = (cv: Omit<CVVersion, 'id' | 'downloadCount'>) => {
-    const newCV: CVVersion = { ...cv, id: `cv-${Date.now()}`, downloadCount: 0 };
+    const newCV: CVVersion = { ...cv, id: `cv-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, downloadCount: 0 };
     setCvVersions(prev => [newCV, ...prev]);
     addAuditLog('CREATE_CV', 'CV', `Uploaded new CV version: ${cv.versionName}`);
+  };
+
+  const updateCVVersion = (id: string, cv: Partial<CVVersion>) => {
+    setCvVersions(prev => prev.map(c => (c.id === id ? { ...c, ...cv } : c)));
+    addAuditLog('UPDATE_CV', 'CV', `Updated CV version ID: ${id}`);
   };
 
   const deleteCVVersion = (id: string) => {
@@ -602,7 +783,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addMessage = (msg: Omit<ContactMessage, 'id' | 'receivedAt' | 'status'>) => {
     const newMsg: ContactMessage = {
       ...msg,
-      id: `msg-${Date.now()}`,
+      id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       receivedAt: new Date().toISOString(),
       status: 'Unread'
     };
@@ -618,21 +799,50 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const addSubscriber = (email: string): boolean => {
-    if (subscribers.some(s => s.email.toLowerCase() === email.toLowerCase())) {
-      return false;
-    }
-    const newSub: Subscriber = {
-      id: `sub-${Date.now()}`,
-      email,
-      subscribedAt: new Date().toISOString(),
-      isActive: true
-    };
-    setSubscribers(prev => [newSub, ...prev]);
-    return true;
+    let added = false;
+    setSubscribers(prev => {
+      if (prev.some(s => s.email.toLowerCase() === email.toLowerCase())) {
+        return prev;
+      }
+      added = true;
+      const newSub: Subscriber = {
+        id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        email,
+        subscribedAt: new Date().toISOString(),
+        isActive: true
+      };
+      return [newSub, ...prev];
+    });
+    return added;
+  };
+
+  const updateSubscriber = (id: string, sub: Partial<Subscriber>) => {
+    setSubscribers(prev => prev.map(s => (s.id === id ? { ...s, ...sub } : s)));
+    addAuditLog('UPDATE_SUBSCRIBER', 'Subscribers', `Updated subscriber ID: ${id}`);
+  };
+
+  const deleteSubscriber = (id: string) => {
+    setSubscribers(prev => prev.filter(s => s.id !== id));
+    addAuditLog('DELETE_SUBSCRIBER', 'Subscribers', `Deleted subscriber ID: ${id}`);
+  };
+
+  const clearAuditLogs = () => {
+    setAuditLogs([]);
   };
 
   const updateThemeSettings = (settings: Partial<ThemeSettings>) => {
-    setThemeSettings(prev => ({ ...prev, ...settings }));
+    setThemeSettings(prev => {
+      const next = { ...prev, ...settings };
+      if (settings.mode !== undefined) {
+        if (settings.mode === 'system') {
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          setIsDarkMode(prefersDark);
+        } else {
+          setIsDarkMode(settings.mode === 'dark');
+        }
+      }
+      return next;
+    });
     addAuditLog('UPDATE_THEME', 'Settings', 'Theme settings updated');
   };
 
@@ -654,6 +864,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const resetToDefaultData = () => {
     setProfile(initialProfile);
     setHeroConfig(initialHeroConfig);
+    setSkillCategories(initialSkillCategories);
     setSkills(initialSkills);
     setExperiences(initialExperiences);
     setEducations(initialEducations);
@@ -672,16 +883,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSeoSettings(initialSEOSettings);
     setSystemSettings(initialSystemSettings);
     setPageSections(initialPageSections);
+    setMessages(initialMessages);
+    setSubscribers(initialSubscribers);
+    setAuditLogs(initialAuditLogs);
+    setAnalytics(initialAnalytics);
     localStorage.removeItem(LOCAL_STORAGE_KEY);
     addAuditLog('RESET_DATABASE', 'System', 'Database reset to initial default seed values');
   };
 
   const exportDatabaseJSON = () => {
     const data = {
-      profile, heroConfig, skills, experiences, educations, projects,
+      profile, heroConfig, skillCategories, skills, experiences, educations, projects,
       certificates, achievements, organizations, trainings, publications,
       testimonials, services, blogPosts, gallery, cvVersions, messages,
-      subscribers, themeSettings, seoSettings, systemSettings, pageSections, auditLogs
+      subscribers, themeSettings, seoSettings, systemSettings, pageSections, auditLogs,
+      analytics
     };
     return JSON.stringify(data, null, 2);
   };
@@ -689,10 +905,33 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const importDatabaseJSON = (jsonStr: string): boolean => {
     try {
       const parsed = JSON.parse(jsonStr);
+      // Must cover every entity that exportDatabaseJSON writes, otherwise a
+      // restore silently drops whatever isn't listed here.
       if (parsed.profile) setProfile(parsed.profile);
+      if (parsed.heroConfig) setHeroConfig(parsed.heroConfig);
+      if (parsed.skillCategories) setSkillCategories(parsed.skillCategories);
       if (parsed.skills) setSkills(parsed.skills);
+      if (parsed.experiences) setExperiences(parsed.experiences);
+      if (parsed.educations) setEducations(parsed.educations);
       if (parsed.projects) setProjects(parsed.projects);
       if (parsed.certificates) setCertificates(parsed.certificates);
+      if (parsed.achievements) setAchievements(parsed.achievements);
+      if (parsed.organizations) setOrganizations(parsed.organizations);
+      if (parsed.trainings) setTrainings(parsed.trainings);
+      if (parsed.publications) setPublications(parsed.publications);
+      if (parsed.testimonials) setTestimonials(parsed.testimonials);
+      if (parsed.services) setServices(parsed.services);
+      if (parsed.blogPosts) setBlogPosts(parsed.blogPosts);
+      if (parsed.gallery) setGallery(parsed.gallery);
+      if (parsed.cvVersions) setCvVersions(parsed.cvVersions);
+      if (parsed.messages) setMessages(parsed.messages);
+      if (parsed.subscribers) setSubscribers(parsed.subscribers);
+      if (parsed.themeSettings) setThemeSettings(parsed.themeSettings);
+      if (parsed.seoSettings) setSeoSettings(parsed.seoSettings);
+      if (parsed.systemSettings) setSystemSettings(parsed.systemSettings);
+      if (parsed.pageSections) setPageSections(parsed.pageSections);
+      if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
+      if (parsed.analytics) setAnalytics(parsed.analytics);
       addAuditLog('IMPORT_DATABASE', 'System', 'Successfully imported database JSON file');
       return true;
     } catch (e) {
@@ -708,6 +947,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setLanguage,
         isAdminLoggedIn,
         adminUser,
+        isAuthResolving,
         loginAdmin,
         logoutAdmin,
         profile,
@@ -715,6 +955,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         heroConfig,
         updateHeroConfig,
         skillCategories,
+        addSkillCategory,
+        updateSkillCategory,
+        deleteSkillCategory,
         skills,
         addSkill,
         updateSkill,
@@ -766,11 +1009,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateBlogPost,
         deleteBlogPost,
         incrementBlogLike,
+        incrementBlogView,
         gallery,
         addGalleryItem,
+        updateGalleryItem,
         deleteGalleryItem,
         cvVersions,
         addCVVersion,
+        updateCVVersion,
         deleteCVVersion,
         setActiveCV,
         incrementCVDownload,
@@ -780,6 +1026,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteMessage,
         subscribers,
         addSubscriber,
+        updateSubscriber,
+        deleteSubscriber,
         themeSettings,
         updateThemeSettings,
         seoSettings,
@@ -790,6 +1038,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updatePageSections,
         auditLogs,
         addAuditLog,
+        clearAuditLogs,
         analytics,
         resetToDefaultData,
         exportDatabaseJSON,
@@ -797,6 +1046,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isCommandPaletteOpen,
         setIsCommandPaletteOpen,
         isDarkMode,
+        setIsDarkMode,
         toggleDarkMode
       }}
     >

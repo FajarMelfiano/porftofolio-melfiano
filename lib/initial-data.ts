@@ -26,268 +26,362 @@ import {
   Subscriber
 } from './types';
 
+/*
+ * Seed content for Fajar Melfiano.
+ *
+ * Sources: melfiano.tech (previous portfolio), github.com/FajarMelfiano,
+ * manunggalsolution.com, and details supplied directly.
+ *
+ * Anything marked TODO could not be verified from those sources — fill it in
+ * from the admin panel rather than leaving a guess on the live site.
+ */
+
 export const initialProfile: ProfileInfo = {
-  name: 'Fajar Melfiano Obese A.T.',
+  name: 'Fajar Melfiano Obese Afoan Toan',
   titles: [
-    { id: 'Full Stack Engineer', en: 'Full Stack Engineer' },
-    { id: 'Software Engineer', en: 'Software Engineer' },
-    { id: 'AI Application Enthusiast', en: 'AI Application Enthusiast' },
-    { id: 'Tech Blogger', en: 'Tech Blogger' }
+    { id: 'Siswa SMK Krian 1 Sidoarjo', en: 'Student at SMK Krian 1 Sidoarjo' },
+    { id: 'Cloud & DevOps Enthusiast', en: 'Cloud & DevOps Enthusiast' },
+    { id: 'Web Developer', en: 'Web Developer' },
+    { id: 'Teknisi Servis HP', en: 'Mobile Device Technician' }
   ],
   currentRole: {
-    id: 'Full-Stack Developer',
-    en: 'Full-Stack Developer'
+    id: 'Pelajar SMK & Cloud Computing Enthusiast',
+    en: 'Vocational Student & Cloud Computing Enthusiast'
   },
   bioShort: {
-    id: 'Insinyur Perangkat Lunak, antusias dengan teknologi web dan AI.',
-    en: 'Software Engineer passionate about web technologies and AI.'
+    id: 'Pelajar SMK Krian 1 Sidoarjo yang senang mengoprek Linux, membangun otomasi, dan belajar cloud computing.',
+    en: 'Vocational student at SMK Krian 1 Sidoarjo who enjoys tinkering with Linux, building automation, and learning cloud computing.'
   },
   bioFull: {
-    id: 'Saya adalah insinyur perangkat lunak yang berdedikasi membangun aplikasi web yang fungsional dan user-friendly.',
-    en: 'I am a software engineer dedicated to building functional and user-friendly web applications.'
+    id: 'Saya suka eksperimen teknologi sejak kecil. Dari ngoprek Linux, main Hyprland, sampai bikin bot WhatsApp dan server sendiri. Sekarang saya fokus mendalami cloud computing dan infrastructure as code, sambil terus mengerjakan proyek web dan otomasi.',
+    en: 'I have loved experimenting with technology since I was little — from tinkering with Linux and ricing Hyprland to building WhatsApp bots and running my own servers. These days I focus on cloud computing and infrastructure as code, while continuing to build web and automation projects.'
   },
-  location: 'Indonesia',
-  email: 'fajarmelfiano@example.com',
-  phone: '+62 812 3456 7890',
-  whatsapp: '+6281234567890',
+  location: 'Krian, Sidoarjo, Jawa Timur',
+  email: 'support@melfiano.my.id',
+  phone: '', // TODO: isi nomor telepon asli
+  whatsapp: '', // TODO: isi nomor WhatsApp asli (format 62xxx)
   github: 'https://github.com/FajarMelfiano',
-  linkedin: 'https://linkedin.com/in/fajarmelfiano',
-  instagram: 'https://instagram.com/fajarmelfiano',
-  telegram: 'https://t.me/fajarmelfiano',
-  avatarUrl: 'https://picsum.photos/seed/fajar-avatar/800/800',
+  linkedin: '', // TODO: isi bila punya LinkedIn
+  instagram: 'https://instagram.com/melfiano',
+  telegram: '', // TODO: isi bila punya Telegram publik
+  avatarUrl: '', // TODO: unggah foto profil, lalu isi URL-nya
   availabilityStatus: 'available',
-  yearsExperience: 7,
-  completedProjectsCount: 38,
-  happyClientsCount: 26,
-  awardsCount: 12,
-  certificatesCount: 18,
-  publicationsCount: 6,
-  birthDate: '1996-08-15',
+  yearsExperience: 3,
+  completedProjectsCount: 20,
+  happyClientsCount: 4,
+  awardsCount: 2,
+  certificatesCount: 2,
+  publicationsCount: 0,
+  birthDate: '', // TODO: isi tanggal lahir
   languages: [
-    { name: 'Indonesia', proficiency: 'Native / Flawless' },
-    { name: 'English', proficiency: 'Professional Working Proficiency (C1)' },
-    { name: 'Japanese', proficiency: 'Elementary (N4)' }
+    { name: 'Indonesia', proficiency: 'Bahasa Ibu' },
+    { name: 'English', proficiency: 'Membaca dokumentasi teknis' }
   ],
-  hobbies: ['Open Source Contributing', 'Tech Blogging', 'Chess', 'Photography', 'Trail Running'],
+  hobbies: [
+    'Ngoprek Linux & Arch',
+    'Ricing Hyprland',
+    'Membaca buku',
+    'Astronomi',
+    'Cerita action inspiratif'
+  ],
   careerGoals: {
-    id: 'Membangun platform cloud berskala global dan membimbing generasi muda talenta digital Indonesia.',
-    en: 'Build global cloud platforms and empower the next generation of Indonesian tech talent.'
+    id: 'Menjadi cloud engineer yang mampu merancang dan mengelola infrastruktur andal, sambil terus berbagi ilmu lewat proyek open source.',
+    en: 'Become a cloud engineer capable of designing and operating reliable infrastructure, while sharing what I learn through open source projects.'
   },
   professionalValues: [
-    { id: 'Inovasi Berkelanjutan', en: 'Continuous Innovation' },
-    { id: 'Kode Bersih & Teruji', en: 'Clean & Testable Code' },
-    { id: 'Kepemimpinan Empatis', en: 'Empathetic Leadership' },
-    { id: 'Fokus Solusi Bisnis', en: 'Business Impact Focus' }
+    { id: 'Belajar Mandiri', en: 'Self-Directed Learning' },
+    { id: 'Rasa Ingin Tahu', en: 'Curiosity' },
+    { id: 'Otomatisasi Pekerjaan Berulang', en: 'Automate the Repetitive' },
+    { id: 'Berbagi Ilmu', en: 'Share What You Learn' }
   ]
 };
 
 export const initialHeroConfig: HeroConfig = {
   greeting: { id: 'Halo 👋, Saya', en: 'Hello 👋, I am' },
   headline: {
-    id: 'Membangun Masa Depan Digital Berbasis AI & Cloud Architecture',
-    en: 'Building the Digital Future with AI & Cloud Architecture'
+    id: 'Belajar Membangun Infrastruktur Cloud & Otomasi',
+    en: 'Learning to Build Cloud Infrastructure & Automation'
   },
   subheadline: {
-    id: 'Mengubah ide kompleks menjadi aplikasi web elegan, cepat, aman, dan siap pakai untuk skala enterprise.',
-    en: 'Transforming complex ideas into elegant, fast, secure, and enterprise-grade web applications.'
+    id: 'Pelajar SMK Krian 1 Sidoarjo. Mengerjakan proyek web, bot otomasi, dan infrastructure as code — dari ngoprek Linux sampai deploy ke cloud.',
+    en: 'A vocational student from Sidoarjo building web projects, automation bots, and infrastructure as code — from ricing Linux to deploying on the cloud.'
   },
-  primaryCtaText: { id: 'Lihat Portofolio Proyek', en: 'Explore My Projects' },
-  secondaryCtaText: { id: 'Unduh CV PDF', en: 'Download CV PDF' },
+  primaryCtaText: { id: 'Lihat Proyek Saya', en: 'See My Projects' },
+  secondaryCtaText: { id: 'Unduh CV', en: 'Download CV' },
   showStats: true,
   heroLayout: 'classic',
   heroBackground: 'dots'
 };
 
 export const initialSkillCategories: SkillCategory[] = [
+  { id: 'cat-os', name: { id: 'Sistem Operasi & Linux', en: 'Operating Systems & Linux' }, icon: 'Server' },
+  { id: 'cat-cloud', name: { id: 'Cloud & Infrastruktur', en: 'Cloud & Infrastructure' }, icon: 'Cloud' },
   { id: 'cat-prog', name: { id: 'Bahasa Pemrograman', en: 'Programming Languages' }, icon: 'Code2' },
-  { id: 'cat-frameworks', name: { id: 'Framework & Libs', en: 'Frameworks & Libraries' }, icon: 'Layers' },
-  { id: 'cat-cloud', name: { id: 'Cloud & Infrastructure', en: 'Cloud & Infrastructure' }, icon: 'Cloud' },
-  { id: 'cat-database', name: { id: 'Database & Storage', en: 'Database & Storage' }, icon: 'Database' },
-  { id: 'cat-tools', name: { id: 'Developer Tools', en: 'Developer Tools' }, icon: 'Wrench' },
-  { id: 'cat-soft', name: { id: 'Keahlian Manajerial', en: 'Soft Skills & Leadership' }, icon: 'Users' }
+  { id: 'cat-web', name: { id: 'Pengembangan Web', en: 'Web Development' }, icon: 'Layers' },
+  { id: 'cat-automation', name: { id: 'Otomasi & Bot', en: 'Automation & Bots' }, icon: 'Sparkles' },
+  { id: 'cat-hardware', name: { id: 'Perangkat Keras', en: 'Hardware' }, icon: 'Wrench' }
 ];
 
 export const initialSkills: Skill[] = [
   {
     id: 'sk-1',
-    name: 'TypeScript & JavaScript (ESNext)',
-    categoryId: 'cat-prog',
-    level: 'Expert',
-    percentage: 96,
-    yearsExperience: 7,
-    icon: 'Code2',
-    description: { id: 'Mastery dalam asynchronous JS, generic types, AST, dan node ecosystem.', en: 'Mastery in async JS, generics, AST transformations, and Node ecosystem.' },
+    name: 'Linux & Arch Linux',
+    categoryId: 'cat-os',
+    level: 'Advanced',
+    percentage: 90,
+    yearsExperience: 4,
+    icon: 'Server',
+    description: {
+      id: 'Instalasi, konfigurasi, dan pemeliharaan sistem Arch Linux untuk pemakaian harian.',
+      en: 'Installing, configuring, and maintaining Arch Linux systems for daily driving.'
+    },
     isFeatured: true,
     order: 1
   },
   {
     id: 'sk-2',
-    name: 'React 19 & Next.js 15 App Router',
-    categoryId: 'cat-frameworks',
-    level: 'Expert',
-    percentage: 95,
-    yearsExperience: 6,
-    icon: 'Atom',
-    description: { id: 'Server Components, Streaming SSR, Server Actions, Middleware, dan Turbopack.', en: 'Server Components, Streaming SSR, Server Actions, Middleware, and Turbopack.' },
+    name: 'Shell Scripting (Bash, Zsh, Fish)',
+    categoryId: 'cat-os',
+    level: 'Advanced',
+    percentage: 88,
+    yearsExperience: 3,
+    icon: 'Code2',
+    description: {
+      id: 'Menulis skrip otomatisasi untuk mempercepat pekerjaan yang berulang.',
+      en: 'Writing automation scripts to speed up repetitive work.'
+    },
     isFeatured: true,
     order: 2
   },
   {
     id: 'sk-3',
-    name: 'Tailwind CSS & Framer Motion',
-    categoryId: 'cat-frameworks',
-    level: 'Expert',
-    percentage: 92,
-    yearsExperience: 5,
+    name: 'Hyprland, Waybar & Theming',
+    categoryId: 'cat-os',
+    level: 'Advanced',
+    percentage: 85,
+    yearsExperience: 2,
     icon: 'Palette',
-    description: { id: 'Desain responsif mikro-interaksi, layout fluid, WCAG AA accessibility.', en: 'Responsive micro-interactions, fluid layouts, WCAG AA accessibility.' },
+    description: {
+      id: 'Kustomisasi window manager Wayland beserta status bar dan tema desktop.',
+      en: 'Customising a Wayland window manager along with status bars and desktop theming.'
+    },
     isFeatured: true,
     order: 3
   },
   {
     id: 'sk-4',
-    name: 'Node.js, Express & NestJS',
-    categoryId: 'cat-frameworks',
+    name: 'Bot Development (WhatsApp, Telegram, Discord)',
+    categoryId: 'cat-automation',
     level: 'Advanced',
-    percentage: 90,
-    yearsExperience: 6,
-    icon: 'Server',
-    description: { id: 'Pengembangan REST, GraphQL, WebSocket server, dan Microservices API.', en: 'Developing REST, GraphQL, WebSocket servers, and Microservices APIs.' },
+    percentage: 85,
+    yearsExperience: 4,
+    icon: 'Sparkles',
+    description: {
+      id: 'Membangun bot untuk balas otomatis, notifikasi, dan jembatan antar platform.',
+      en: 'Building bots for auto-replies, notifications, and cross-platform bridges.'
+    },
     isFeatured: true,
     order: 4
   },
   {
     id: 'sk-5',
-    name: 'PostgreSQL, Prisma ORM & Redis',
-    categoryId: 'cat-database',
-    level: 'Advanced',
-    percentage: 88,
-    yearsExperience: 5,
-    icon: 'Database',
-    description: { id: 'Optimasi query SQL, indexing, database migrations, dan caching strategy.', en: 'SQL query optimization, indexing, migrations, and caching strategies.' },
+    name: 'Web Scraping & Integrasi API',
+    categoryId: 'cat-automation',
+    level: 'Intermediate',
+    percentage: 80,
+    yearsExperience: 3,
+    icon: 'Code2',
+    description: {
+      id: 'Mengambil dan mengolah data dari berbagai sumber web dan REST API.',
+      en: 'Collecting and processing data from various web sources and REST APIs.'
+    },
     isFeatured: true,
     order: 5
   },
   {
     id: 'sk-6',
-    name: 'Google Cloud Platform & Cloud Run',
+    name: 'Terraform & Infrastructure as Code',
     categoryId: 'cat-cloud',
-    level: 'Advanced',
-    percentage: 86,
-    yearsExperience: 4,
+    level: 'Intermediate',
+    percentage: 75,
+    yearsExperience: 1,
     icon: 'Cloud',
-    description: { id: 'Deploy containerized Docker apps, GCP PubSub, BigQuery, IAM Security.', en: 'Deploy containerized Docker apps, GCP Pub/Sub, BigQuery, and IAM Security.' },
+    description: {
+      id: 'Mendefinisikan infrastruktur cloud sebagai kode, dipakai pada LKS Cloud Computing.',
+      en: 'Defining cloud infrastructure as code, used in the LKS Cloud Computing contest.'
+    },
     isFeatured: true,
     order: 6
   },
   {
     id: 'sk-7',
-    name: 'Generative AI & Gemini API Integration',
-    categoryId: 'cat-tools',
-    level: 'Advanced',
-    percentage: 89,
-    yearsExperience: 3,
-    icon: 'Sparkles',
-    description: { id: 'Prompt Engineering, RAG Architectures, Multimodal AI, dan Fine-Tuning.', en: 'Prompt Engineering, RAG Architectures, Multimodal AI, and Fine-Tuning.' },
+    name: 'AWS (ECS, Glue, SageMaker, S3)',
+    categoryId: 'cat-cloud',
+    level: 'Intermediate',
+    percentage: 70,
+    yearsExperience: 1,
+    icon: 'Cloud',
+    description: {
+      id: 'Deploy container ke ECS Fargate, pipeline ETL dengan Glue, dan model ML di SageMaker.',
+      en: 'Deploying containers to ECS Fargate, ETL pipelines with Glue, and ML models on SageMaker.'
+    },
     isFeatured: true,
     order: 7
   },
   {
     id: 'sk-8',
-    name: 'Technical Team Leadership & Mentorship',
-    categoryId: 'cat-soft',
-    level: 'Expert',
-    percentage: 92,
-    yearsExperience: 4,
-    icon: 'Users',
-    description: { id: 'Agile Scrum Facilitation, Code Review Standards, dan Talent Development.', en: 'Agile Scrum Facilitation, Code Review Standards, and Talent Development.' },
+    name: 'Python',
+    categoryId: 'cat-prog',
+    level: 'Intermediate',
+    percentage: 78,
+    yearsExperience: 3,
+    icon: 'Code2',
+    description: {
+      id: 'Skrip otomasi, aplikasi CLI, pemrosesan data, dan tooling internal.',
+      en: 'Automation scripts, CLI applications, data processing, and internal tooling.'
+    },
     isFeatured: true,
     order: 8
+  },
+  {
+    id: 'sk-9',
+    name: 'TypeScript & JavaScript',
+    categoryId: 'cat-prog',
+    level: 'Intermediate',
+    percentage: 75,
+    yearsExperience: 3,
+    icon: 'Code2',
+    description: {
+      id: 'Bahasa utama untuk hampir semua proyek web yang saya kerjakan.',
+      en: 'The main language behind almost every web project I build.'
+    },
+    isFeatured: true,
+    order: 9
+  },
+  {
+    id: 'sk-10',
+    name: 'React & Next.js',
+    categoryId: 'cat-web',
+    level: 'Intermediate',
+    percentage: 72,
+    yearsExperience: 2,
+    icon: 'Atom',
+    description: {
+      id: 'Membangun antarmuka web interaktif dan situs yang dideploy ke Vercel.',
+      en: 'Building interactive web interfaces and sites deployed to Vercel.'
+    },
+    isFeatured: true,
+    order: 10
+  },
+  {
+    id: 'sk-11',
+    name: 'Tailwind CSS',
+    categoryId: 'cat-web',
+    level: 'Intermediate',
+    percentage: 70,
+    yearsExperience: 2,
+    icon: 'Palette',
+    description: {
+      id: 'Menyusun tampilan responsif dengan pendekatan utility-first.',
+      en: 'Composing responsive interfaces with a utility-first approach.'
+    },
+    isFeatured: false,
+    order: 11
+  },
+  {
+    id: 'sk-12',
+    name: 'Servis Hardware & Software HP',
+    categoryId: 'cat-hardware',
+    level: 'Advanced',
+    percentage: 85,
+    yearsExperience: 3,
+    icon: 'Wrench',
+    description: {
+      id: 'Flashing, unlock, ganti sparepart, dan troubleshooting perangkat Android maupun iPhone.',
+      en: 'Flashing, unlocking, part replacement, and troubleshooting on Android and iPhone devices.'
+    },
+    isFeatured: true,
+    order: 12
   }
 ];
 
 export const initialExperiences: Experience[] = [
   {
     id: 'exp-1',
-    companyName: 'Nusantara Global Tech',
-    companyLogo: 'https://picsum.photos/seed/nusantara-logo/200/200',
-    companyUrl: 'https://example.com',
+    companyName: 'Leo Printing Tarik',
+    companyUrl: '',
     position: {
-      id: 'Lead Software Architect & Engineering Manager',
-      en: 'Lead Software Architect & Engineering Manager'
+      id: 'Peserta Praktik Kerja Lapangan (PKL)',
+      en: 'Internship Student (PKL)'
     },
-    employmentType: 'Full-time',
-    location: 'Jakarta (Hybrid)',
-    startDate: '2023-01',
-    isCurrent: true,
+    employmentType: 'Internship',
+    location: 'Tarik, Sidoarjo',
+    startDate: '2025-07',
+    endDate: '2025-10',
+    isCurrent: false,
     description: {
-      id: 'Memimpin tim yang terdiri dari 14 insinyur frontend, backend, dan DevOps untuk membangun platform Fintech SaaS berskala internasional.',
-      en: 'Leading an engineering team of 14 frontend, backend, and DevOps engineers building an international Fintech SaaS platform.'
+      id: 'Menjalani praktik kerja lapangan selama empat bulan di percetakan Leo Printing Tarik, Sidoarjo.',
+      en: 'Completed a four-month vocational internship at Leo Printing Tarik, a printing business in Sidoarjo.'
     },
     responsibilities: [
-      { id: 'Merancang arsitektur micro-frontend berbasis Next.js dan Tailwind.', en: 'Designed micro-frontend architecture using Next.js and Tailwind.' },
-      { id: 'Mengimplementasikan CI/CD pipeline otomatis dengan GitHub Actions & Cloud Run.', en: 'Implemented automated CI/CD pipelines with GitHub Actions & Cloud Run.' },
-      { id: 'Mengurangi latensi API sebesar 42% melalui caching layer Redis & Query Optimization.', en: 'Reduced API response latency by 42% using Redis caching layers and Query Optimization.' }
+      // TODO: rinci tugas harian selama PKL agar bagian ini lebih meyakinkan
     ],
-    achievements: [
-      { id: 'Berhasil meluncurkan produk tepat waktu dengan 99.98% SLA uptime.', en: 'Successfully launched platform on schedule with 99.98% SLA uptime.' },
-      { id: 'Dianugerahi "Tech Innovator of the Year 2024" oleh perusahaan.', en: 'Awarded "Tech Innovator of the Year 2024" by executive leadership.' }
-    ],
-    technologies: ['Next.js 15', 'TypeScript', 'PostgreSQL', 'GCP', 'Docker', 'Redis', 'Gemini AI API'],
+    achievements: [],
+    technologies: [],
     order: 1
   },
   {
     id: 'exp-2',
-    companyName: 'Astra Digital Solution',
-    companyLogo: 'https://picsum.photos/seed/astra-logo/200/200',
-    companyUrl: 'https://example.com',
+    companyName: 'Manunggal Solution',
+    companyUrl: 'https://www.manunggalsolution.com/',
     position: {
-      id: 'Senior Full Stack Developer',
-      en: 'Senior Full Stack Developer'
+      id: 'Teknisi IT', // TODO: sesuaikan dengan jabatan resmi Anda
+      en: 'IT Technician'
     },
-    employmentType: 'Full-time',
-    location: 'Bandung, Indonesia',
-    startDate: '2020-06',
-    endDate: '2022-12',
+    employmentType: 'Part-time',
+    location: 'Waru, Sidoarjo',
+    startDate: '2024-01', // TODO: sesuaikan bulan mulai yang tepat
+    endDate: '2025-12', // TODO: sesuaikan bulan selesai yang tepat
     isCurrent: false,
     description: {
-      id: 'Bertanggung jawab atas pengembangan aplikasi E-Commerce enterprise dengan traffic bulanan lebih dari 2 juta pengguna aktif.',
-      en: 'Responsible for core development of an enterprise E-Commerce application with over 2M monthly active users.'
+      id: 'Bekerja di perusahaan penyedia solusi IT yang menangani servis hardware dan software komputer, laptop, serta perangkat mobile, sekaligus pengembangan perangkat lunak.',
+      en: 'Worked at an IT solutions company handling hardware and software servicing for computers, laptops, and mobile devices, alongside software development.'
     },
     responsibilities: [
-      { id: 'Membangun checkout engine yang aman dengan integrasi multi-payment gateway.', en: 'Built secure payment checkout engine integrating multi-payment gateways.' },
-      { id: 'Mengatur state management global berbasis Zustand dan React Query.', en: 'Architected global state management using Zustand and React Query.' }
+      // TODO: rinci tanggung jawab Anda di Manunggal Solution
     ],
-    achievements: [
-      { id: 'Meningkatkan konversi penjualan e-commerce sebesar 18%.', en: 'Increased overall checkout conversion rate by 18%.' }
-    ],
-    technologies: ['React', 'Node.js', 'Express', 'GraphQL', 'PostgreSQL', 'Tailwind CSS'],
+    achievements: [],
+    technologies: [],
     order: 2
   },
   {
     id: 'exp-3',
-    companyName: 'Inovasi Media Studio',
-    companyLogo: 'https://picsum.photos/seed/inovasi-logo/200/200',
+    companyName: 'Freelance / Mandiri',
     position: {
-      id: 'Frontend Web Developer',
-      en: 'Frontend Web Developer'
+      id: 'Teknisi Servis HP',
+      en: 'Mobile Device Technician'
     },
-    employmentType: 'Full-time',
-    location: 'Yogyakarta, Indonesia',
-    startDate: '2018-02',
-    endDate: '2020-05',
+    employmentType: 'Freelance',
+    location: 'Krian, Sidoarjo',
+    startDate: '2023-01',
+    endDate: '2024-12',
     isCurrent: false,
     description: {
-      id: 'Mengembangkan puluhan situs web interaktif, portal berita, dan dashboard analytics untuk klien korporat.',
-      en: 'Developed dozens of interactive web applications, news portals, and analytics dashboards for corporate clients.'
+      id: 'Menerima servis hardware dan software perangkat Android maupun iPhone secara mandiri.',
+      en: 'Independently took on hardware and software repair jobs for Android and iPhone devices.'
     },
     responsibilities: [
-      { id: 'Slice UI dari Figma ke HTML/CSS/JS dengan presisi pixel-perfect.', en: 'Sliced Figma UI designs into pixel-perfect responsive HTML/CSS/JS code.' }
+      {
+        id: 'Flashing, unlock, dan pemulihan sistem perangkat mobile.',
+        en: 'Flashing, unlocking, and recovering mobile device systems.'
+      },
+      {
+        id: 'Penggantian sparepart dan troubleshooting kerusakan hardware.',
+        en: 'Replacing spare parts and troubleshooting hardware faults.'
+      }
     ],
-    achievements: [
-      { id: 'Menyelesaikan 25+ proyek client dalam 2 tahun dengan skor kepuasan 100%.', en: 'Completed 25+ client projects over 2 years with a 100% satisfaction score.' }
-    ],
-    technologies: ['JavaScript', 'Vue.js', 'Tailwind CSS', 'REST API', 'Webpack'],
+    achievements: [],
+    technologies: [],
     order: 3
   }
 ];
@@ -295,223 +389,442 @@ export const initialExperiences: Experience[] = [
 export const initialEducations: Education[] = [
   {
     id: 'edu-1',
-    institutionName: 'Universitas Gadjah Mada (UGM)',
-    institutionLogo: 'https://picsum.photos/seed/ugm-logo/200/200',
-    institutionUrl: 'https://ugm.ac.id',
-    degree: { id: 'Magister Teknik Informatika (M.Kom.)', en: 'Master of Computer Science (M.Kom.)' },
-    fieldOfStudy: { id: 'Sistem Terdistribusi & Kecerdasan Buatan', en: 'Distributed Systems & Artificial Intelligence' },
-    startYear: '2019',
-    endYear: '2021',
-    gpa: '3.92',
-    maxGpa: '4.00',
-    location: 'Yogyakarta, Indonesia',
+    institutionName: 'SMK Krian 1 Sidoarjo',
+    institutionUrl: '',
+    degree: { id: 'Sekolah Menengah Kejuruan', en: 'Vocational High School' },
+    fieldOfStudy: {
+      id: 'Teknik Komputer & Jaringan', // TODO: ganti bila jurusan Anda berbeda
+      en: 'Computer & Network Engineering'
+    },
+    startYear: '2023', // TODO: sesuaikan tahun masuk
+    endYear: '2026', // TODO: sesuaikan tahun lulus
+    gpa: '',
+    maxGpa: '',
+    location: 'Krian, Sidoarjo',
     description: {
-      id: 'Fokus penelitian pada optimasi pemrosesan data terdistribusi dan model pembelajaran mesin untuk analisis prediksi pasar.',
-      en: 'Research focus on distributed data processing optimization and machine learning prediction models.'
+      id: 'Menempuh pendidikan kejuruan sambil aktif mengikuti Lomba Kompetensi Siswa bidang Cloud Computing.',
+      en: 'Pursuing vocational education while actively competing in the Cloud Computing category of the national student skills contest (LKS).'
     },
     academicAchievements: [
-      { id: 'Lulus dengan Predikat Cumlaude', en: 'Graduated with Cum Laude Honors' },
-      { id: 'Publikasi Jurnal Internasional Terindeks Scopus Q1', en: 'Published Scopus Q1 Indexed International Journal Paper' }
+      {
+        id: 'Peserta LKS Cloud Computing Tingkat Kabupaten 2026',
+        en: 'Participant, LKS Cloud Computing — Regency Level 2026'
+      },
+      {
+        id: 'Peserta LKS Cloud Computing Tingkat Provinsi Jawa Timur 2026',
+        en: 'Participant, LKS Cloud Computing — East Java Province Level 2026'
+      }
     ],
-    thesisTitle: {
-      id: 'Arsitektur RAG Berbasis Graph Neural Network untuk Pencarian Pengetahuan Terdistribusi',
-      en: 'Graph Neural Network-Based RAG Architecture for Distributed Knowledge Retrieval'
-    },
     order: 1
-  },
-  {
-    id: 'edu-2',
-    institutionName: 'Institut Teknologi Bandung (ITB)',
-    institutionLogo: 'https://picsum.photos/seed/itb-logo/200/200',
-    degree: { id: 'Sarjana Teknik Informatika (S.T.)', en: 'Bachelor of Computer Science (B.Sc.)' },
-    fieldOfStudy: { id: 'Rekayasa Perangkat Lunak', en: 'Software Engineering' },
-    startYear: '2014',
-    endYear: '2018',
-    gpa: '3.81',
-    maxGpa: '4.00',
-    location: 'Bandung, Indonesia',
-    description: {
-      id: 'Mengikuti berbagai kompetisi pemrograman, menjadi Asisten Dosen Algoritma & Struktur Data.',
-      en: 'Participated in competitive programming contests and served as Teaching Assistant for Data Structures & Algorithms.'
-    },
-    academicAchievements: [
-      { id: 'Juara 1 Gemastik Bidang Pemrograman Web', en: '1st Winner of National Gemastik Web Programming' },
-      { id: 'Dean’s Honor List 6 Semester Berturut-turut', en: 'Dean’s Honor List for 6 Consecutive Semesters' }
-    ],
-    order: 2
   }
 ];
 
 export const initialProjects: Project[] = [
   {
     id: 'proj-1',
-    slug: 'ai-enterprise-knowledge-base',
-    title: 'NexusAI - Enterprise Knowledge Base Platform',
+    slug: 'healthpredict-ai',
+    title: 'HealthPredict AI',
     shortDescription: {
-      id: 'Platform SaaS Manajemen Pengetahuan Perusahaan terintegrasi Gemini 1.5 Pro RAG, Vector DB, dan Realtime Multi-User Editor.',
-      en: 'Enterprise Knowledge Management SaaS platform powered by Gemini 1.5 Pro RAG, Vector DB, and Realtime Multi-User Editor.'
+      id: 'Pipeline machine learning end-to-end di AWS untuk prediksi kesehatan — dikerjakan pada LKS Cloud Computing Tingkat Provinsi 2026.',
+      en: 'An end-to-end machine learning pipeline on AWS for health prediction, built for the LKS Cloud Computing provincial contest 2026.'
     },
     fullDescription: {
-      id: 'NexusAI adalah aplikasi web enterprise modern yang memfasilitasi pencarian pengetahuan cepat, ringkasan dokumen otomatis, dan tanya jawab kontekstual atas seluruh file PDF, Word, dan Notion internal perusahaan.',
-      en: 'NexusAI is a modern enterprise web application facilitating ultra-fast knowledge retrieval, automated document summarization, and contextual Q&A across all internal PDFs, Word files, and Notion documents.'
+      id: 'Proyek ini menggabungkan ETL berbasis PySpark di AWS Glue dengan pipeline SageMaker tiga tahap: processing, training, dan deployment ke real-time endpoint. Dikerjakan sebagai materi Lomba Kompetensi Siswa bidang Cloud Computing tingkat Provinsi Jawa Timur 2026.',
+      en: 'The project combines a PySpark ETL job on AWS Glue with a three-step SageMaker pipeline covering processing, training, and deployment to a real-time endpoint. Built as material for the 2026 East Java provincial Cloud Computing skills contest.'
     },
-    thumbnail: 'https://picsum.photos/seed/nexus-ai-thumb/1200/800',
-    gallery: [
-      'https://picsum.photos/seed/nexus-ai-1/1200/800',
-      'https://picsum.photos/seed/nexus-ai-2/1200/800',
-      'https://picsum.photos/seed/nexus-ai-3/1200/800'
-    ],
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    category: 'AI & Web SaaS',
-    tags: ['Next.js 15', 'Gemini AI API', 'PostgreSQL', 'Vector Search', 'Tailwind CSS'],
-    technologies: ['Next.js 15', 'TypeScript', 'Tailwind CSS', 'Google GenAI SDK', 'Prisma', 'Cloud Run'],
-    role: { id: 'Lead Full Stack Architect & AI Developer', en: 'Lead Full Stack Architect & AI Developer' },
-    completedDate: '2024-11-15',
+    thumbnail: '',
+    gallery: [],
+    category: 'Cloud & Machine Learning',
+    tags: ['AWS', 'SageMaker', 'AWS Glue', 'PySpark', 'Python'],
+    technologies: ['Python', 'PySpark', 'AWS Glue', 'Amazon SageMaker', 'Amazon S3'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2026-04-15',
     status: 'Completed',
-    demoUrl: 'https://example.com/demo/nexusai',
-    repoUrl: 'https://github.com/oqiifebriansyah/nexus-ai-platform',
-    problemStatement: {
-      id: 'Perusahaan mengalami kesulitan memproses ribuan dokumen SOP internal sehingga waktu pencarian informasi memakan rata-rata 35 menit per tiket.',
-      en: 'The company struggled with indexing thousands of internal SOP documents, taking employees an average of 35 minutes per query.'
-    },
-    solution: {
-      id: 'Membangun engine RAG berbasis Gemini AI API yang dapat menjawab pertanyaan spesifik dari dokumen secara presisi lengkap dengan sitasi halaman.',
-      en: 'Built a Gemini AI-powered RAG engine answering specific document queries with pinpoint accuracy and exact page citations.'
-    },
+    repoUrl: 'https://github.com/FajarMelfiano/healthpredict',
     keyFeatures: [
-      { id: 'Upload dokumen PDF/Docx multi-folder', en: 'Multi-folder PDF/Docx drag-and-drop upload' },
-      { id: 'Pencarian semantik berbasis Vektor (<100ms response)', en: 'Semantic Vector Search (<100ms response time)' },
-      { id: 'Sistem RAG Gemini AI dengan riwayat sitasi', en: 'Gemini AI RAG chat stream with citation history' },
-      { id: 'Role-based access control (RBAC) granular', en: 'Granular Role-Based Access Control (RBAC)' }
+      { id: 'ETL PySpark sembilan tahap transformasi data', en: 'Nine-stage PySpark ETL data transformation' },
+      { id: 'Pipeline SageMaker tiga langkah', en: 'Three-step SageMaker pipeline' },
+      { id: 'Deployment model ke real-time endpoint', en: 'Model deployment to a real-time endpoint' }
     ],
-    challenges: {
-      id: 'Memastikan latensi streaming balasan AI tetap terjangkau di bawah 1.5 detik pada dokumen >500 halaman.',
-      en: 'Ensuring AI streaming response latency remained under 1.5s even on 500+ page PDFs.'
-    },
-    results: {
-      id: 'Mengurangi waktu pencarian dokumen dari 35 menit menjadi 8 detik per kueri.',
-      en: 'Reduced internal knowledge lookup time from 35 minutes down to 8 seconds per query.'
-    },
     isFeatured: true,
     order: 1,
-    views: 1420
+    views: 0
   },
   {
     id: 'proj-2',
-    slug: 'finflow-crypto-fiat-dashboard',
-    title: 'FinFlow - Omnichannel Financial Analytics',
+    slug: 'lks-url-shortener',
+    title: 'LKS URL Shortener — Arsitektur ECS Fargate',
     shortDescription: {
-      id: 'Dashboard Analytics Keuangan Realtime dengan Grafik Interaktif, Otomatisasi Laporan Pajak, dan Deteksi Anomali.',
-      en: 'Realtime Omnichannel Financial Analytics Dashboard featuring Interactive Recharts, Automated Tax Reporting, and Anomaly Alerts.'
+      id: 'Monorepo tiga layanan yang dideploy sebagai container ECS Fargate di belakang satu Application Load Balancer.',
+      en: 'A three-service monorepo deployed as ECS Fargate containers behind a single Application Load Balancer.'
     },
     fullDescription: {
-      id: 'FinFlow menyediakan solusi visualisasi keuangan menyeluruh untuk startup FinTech. Mengombinasikan feed transaksi perbankan dan transaksi aset digital dalam satu antarmuka yang bersih.',
-      en: 'FinFlow offers comprehensive financial visualization for FinTech startups, merging banking transaction feeds and digital asset movements into a unified, crisp interface.'
+      id: 'Aplikasi pemendek URL yang dipecah menjadi beberapa layanan terpisah, masing-masing berjalan sebagai container di ECS Fargate dan diarahkan melalui satu ALB. Merupakan Modul 2 LKS Cloud Computing Jawa Timur 2026.',
+      en: 'A URL shortener split into separate services, each running as an ECS Fargate container and routed through a single ALB. This is Module 2 of the 2026 East Java Cloud Computing skills contest.'
     },
-    thumbnail: 'https://picsum.photos/seed/finflow-thumb/1200/800',
-    gallery: [
-      'https://picsum.photos/seed/finflow-1/1200/800',
-      'https://picsum.photos/seed/finflow-2/1200/800'
-    ],
-    category: 'Fintech & Dashboard',
-    tags: ['React 19', 'Recharts', 'Tailwind CSS', 'Node.js', 'WebSocket'],
-    technologies: ['React 19', 'TypeScript', 'Recharts', 'Zustand', 'Tailwind CSS', 'Framer Motion'],
-    role: { id: 'Senior Frontend Developer', en: 'Senior Frontend Developer' },
-    completedDate: '2024-06-20',
+    thumbnail: '',
+    gallery: [],
+    category: 'Cloud & DevOps',
+    tags: ['AWS', 'ECS Fargate', 'ALB', 'TypeScript', 'Docker'],
+    technologies: ['TypeScript', 'Docker', 'AWS ECS Fargate', 'Application Load Balancer'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2026-04-15',
     status: 'Completed',
-    demoUrl: 'https://example.com/demo/finflow',
-    repoUrl: 'https://github.com/oqiifebriansyah/finflow-dashboard',
+    repoUrl: 'https://github.com/FajarMelfiano/APP-Terraform',
     isFeatured: true,
     order: 2,
-    views: 980
+    views: 0
   },
   {
     id: 'proj-3',
-    slug: 'medicare-telehealth-mobile-web',
-    title: 'MediCare - Integrated Healthcare System',
+    slug: 'infrastructure-terraform',
+    title: 'Infrastructure as Code dengan Terraform',
     shortDescription: {
-      id: 'Sistem Rumah Sakit & Konsultasi Dokter Online dengan Fitur Resep Digital, Video Call, dan Rekam Medis Terenkripsi.',
-      en: 'Integrated Hospital & Doctor Teleconsultation Web System with Digital Prescriptions, Video Calls, and Encrypted EHR.'
+      id: 'Definisi infrastruktur cloud sebagai kode menggunakan Terraform untuk LKS Cloud Computing Jawa Timur 2026.',
+      en: 'Cloud infrastructure defined as code with Terraform for the 2026 East Java Cloud Computing contest.'
     },
     fullDescription: {
-      id: 'Platform telehealth komprehensif yang menghubungkan lebih dari 150+ rumah sakit di Indonesia dengan pasien untuk jadwal janji temu dan konsultasi medis.',
-      en: 'Comprehensive telehealth portal connecting over 150+ hospitals across Indonesia with patients for online appointment bookings and medical records.'
+      id: 'Kumpulan modul Terraform yang menyediakan seluruh infrastruktur pendukung aplikasi kontes, sehingga lingkungan dapat dibangun ulang secara konsisten dan berulang.',
+      en: 'A set of Terraform modules that provision the entire supporting infrastructure for the contest application, so the environment can be rebuilt consistently and repeatably.'
     },
-    thumbnail: 'https://picsum.photos/seed/medicare-thumb/1200/800',
-    gallery: ['https://picsum.photos/seed/medicare-1/1200/800'],
-    category: 'Healthcare & Mobile Web',
-    tags: ['Next.js', 'WebRTC', 'PostgreSQL', 'Tailwind CSS'],
-    technologies: ['Next.js', 'TypeScript', 'WebRTC', 'Tailwind CSS', 'Prisma', 'PostgreSQL'],
-    role: { id: 'Full Stack Engineer', en: 'Full Stack Engineer' },
-    completedDate: '2023-09-10',
+    thumbnail: '',
+    gallery: [],
+    category: 'Cloud & DevOps',
+    tags: ['Terraform', 'HCL', 'AWS', 'IaC'],
+    technologies: ['Terraform', 'HCL', 'AWS'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2026-04-15',
     status: 'Completed',
-    demoUrl: 'https://example.com/demo/medicare',
+    repoUrl: 'https://github.com/FajarMelfiano/infrastructure-terraform',
     isFeatured: true,
     order: 3,
-    views: 850
+    views: 0
+  },
+  {
+    id: 'proj-3-plant',
+    slug: 'dokumentasi-tanaman',
+    title: 'Proyek Pertanian: Dokumentasi Tanaman',
+    shortDescription: {
+      id: 'Dokumentasi progress tanaman selama 3 bulan dari benih hingga panen.',
+      en: 'Documentation of plant progress over 3 months from seed to harvest.'
+    },
+    fullDescription: {
+      id: 'Proyek penugasan untuk menanam dan mendokumentasikan perkembangan tanaman secara kronologis dari minggu ke minggu.',
+      en: 'An assignment project to plant and document plant development chronologically week by week.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'Dokumentasi',
+    tags: ['Pertanian', 'Dokumentasi', 'Tugas'],
+    technologies: [],
+    role: { id: 'Pengamat', en: 'Observer' },
+    completedDate: '2026-10-01', // Example date
+    status: 'In Progress',
+    projectType: 'plant-documentation',
+    plantInfo: {
+      name: 'Cabai Rawit', // Placeholder
+      variety: 'Capsicum frutescens',
+      plantDate: '2026-07-01', // Placeholder
+      expectedHarvestDate: '2026-10-01'
+    },
+    plantTimeline: [
+      {
+        id: 'timeline-1',
+        date: '2026-07-01',
+        photoUrl: '', // Add image later
+        week: 1,
+        growthStage: 'seeding',
+        description: {
+          id: 'Hari pertama: penyemaian benih di polybag kecil dengan campuran tanah dan kompos.',
+          en: 'Day 1: Seeding in small polybags with a mix of soil and compost.'
+        }
+      }
+    ],
+    isFeatured: true,
+    order: 4,
+    views: 0
+  },
+  {
+    id: 'proj-4',
+    slug: 'moviebox-client',
+    title: 'Moviebox Client',
+    shortDescription: {
+      id: 'Klien Python tak resmi untuk mencari, streaming, dan mengunduh film, serial, atau anime lengkap dengan subtitle.',
+      en: 'An unofficial Python client for searching, streaming, and downloading movies, series, or anime with subtitle support.'
+    },
+    fullDescription: {
+      id: 'Aplikasi terminal dengan antarmuka TUI layar penuh dan alur Home → Search → Source → Subtitle → Run. Mendukung banyak penyedia sumber untuk film, serial, maupun anime, serta beberapa sumber subtitle sekaligus.',
+      en: 'A terminal application with a full-screen TUI and a Home → Search → Source → Subtitle → Run flow. It supports multiple stream providers for movies, series, and anime, plus several subtitle sources.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'CLI & Automation',
+    tags: ['Python', 'TUI', 'CLI', 'Stremio'],
+    technologies: ['Python'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2026-05-07',
+    status: 'Completed',
+    repoUrl: 'https://github.com/FajarMelfiano/MOVIEBOX-CLIENT',
+    keyFeatures: [
+      { id: 'TUI interaktif layar penuh', en: 'Interactive full-screen TUI' },
+      { id: 'Resolusi stream berbasis banyak provider', en: 'Provider-based stream resolution' },
+      { id: 'Pemilihan sumber subtitle', en: 'Subtitle source selection' }
+    ],
+    isFeatured: true,
+    order: 4,
+    views: 0
+  },
+  {
+    id: 'proj-5',
+    slug: 'bridge-whatsapp-telegram',
+    title: 'Bridge WhatsApp ↔ Telegram',
+    shortDescription: {
+      id: 'Jembatan pesan dua arah yang meneruskan percakapan antara WhatsApp dan Telegram.',
+      en: 'A two-way message bridge that relays conversations between WhatsApp and Telegram.'
+    },
+    fullDescription: {
+      id: 'Alat otomasi yang menyambungkan dua platform pesan berbeda sehingga percakapan dapat dipantau dan dibalas dari satu tempat.',
+      en: 'An automation tool that connects two different messaging platforms so conversations can be monitored and answered from a single place.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'Otomasi & Bot',
+    tags: ['WhatsApp', 'Telegram', 'Bot', 'Automation'],
+    technologies: ['Node.js', 'Baileys', 'Telegram Bot API'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2026-05-15',
+    status: 'Completed',
+    repoUrl: 'https://github.com/FajarMelfiano/Bridge-Whatsapp-Telegram',
+    isFeatured: true,
+    order: 5,
+    views: 0
+  },
+  {
+    id: 'proj-6',
+    slug: 'uno-game',
+    title: 'UNO Game Online',
+    shortDescription: {
+      id: 'Permainan kartu UNO berbasis web yang bisa dimainkan langsung dari browser.',
+      en: 'A browser-based UNO card game playable straight from the web.'
+    },
+    fullDescription: {
+      id: 'Implementasi permainan kartu UNO dengan antarmuka web interaktif, dibangun menggunakan TypeScript dan dideploy ke Vercel.',
+      en: 'An implementation of the UNO card game with an interactive web interface, built with TypeScript and deployed to Vercel.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'Web & Game',
+    tags: ['TypeScript', 'React', 'Game'],
+    technologies: ['TypeScript', 'React', 'Vercel'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2026-06-28',
+    status: 'Completed',
+    demoUrl: 'https://uno-game-kappa.vercel.app',
+    repoUrl: 'https://github.com/FajarMelfiano/UNO-GAME',
+    isFeatured: true,
+    order: 6,
+    views: 0
+  },
+  {
+    id: 'proj-7',
+    slug: 'gallery-photos',
+    title: 'Gallery Photos',
+    shortDescription: {
+      id: 'Galeri foto web dengan tata letak responsif dan pratinjau gambar.',
+      en: 'A web photo gallery with a responsive layout and image previews.'
+    },
+    fullDescription: {
+      id: 'Aplikasi galeri untuk menampilkan koleksi foto dengan navigasi yang ringan dan tampilan yang menyesuaikan ukuran layar.',
+      en: 'A gallery application for presenting photo collections with lightweight navigation and a layout that adapts to screen size.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'Web Development',
+    tags: ['TypeScript', 'React', 'Gallery'],
+    technologies: ['TypeScript', 'React', 'Vercel'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2026-05-25',
+    status: 'Completed',
+    demoUrl: 'https://gallery-photos-cnbm.vercel.app',
+    repoUrl: 'https://github.com/FajarMelfiano/Gallery-Photos',
+    isFeatured: false,
+    order: 7,
+    views: 0
+  },
+  {
+    id: 'proj-8',
+    slug: 'kedai-kopi',
+    title: 'Kedai Kopi',
+    shortDescription: {
+      id: 'Situs profil kedai kopi dengan daftar menu dan tampilan yang hangat.',
+      en: 'A coffee shop profile site with a menu listing and a warm visual style.'
+    },
+    fullDescription: {
+      id: 'Website statis untuk memperkenalkan sebuah kedai kopi, memuat menu, suasana, dan informasi kontak.',
+      en: 'A static website introducing a coffee shop, covering its menu, atmosphere, and contact details.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'Web Development',
+    tags: ['TypeScript', 'React', 'Landing Page'],
+    technologies: ['TypeScript', 'React', 'Vercel'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2026-05-11',
+    status: 'Completed',
+    demoUrl: 'https://kedai-kopi-mauve.vercel.app',
+    repoUrl: 'https://github.com/FajarMelfiano/Kedai-Kopi',
+    isFeatured: false,
+    order: 8,
+    views: 0
+  },
+  {
+    id: 'proj-9',
+    slug: 'game-rpg',
+    title: 'Game RPG Berbasis Web',
+    shortDescription: {
+      id: 'Permainan RPG sederhana yang berjalan sepenuhnya di browser.',
+      en: 'A simple RPG that runs entirely in the browser.'
+    },
+    fullDescription: {
+      id: 'Eksperimen membuat permainan bergaya RPG dengan sistem pertarungan dan progres karakter, dibangun memakai TypeScript.',
+      en: 'An experiment in building an RPG-style game with a combat system and character progression, built with TypeScript.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'Web & Game',
+    tags: ['TypeScript', 'React', 'Game'],
+    technologies: ['TypeScript', 'React', 'Vercel'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2025-09-04',
+    status: 'Completed',
+    demoUrl: 'https://rpg-v2-three.vercel.app',
+    repoUrl: 'https://github.com/FajarMelfiano/RPG-V2',
+    isFeatured: false,
+    order: 9,
+    views: 0
+  },
+  {
+    id: 'proj-10',
+    slug: 'data-bank-soal',
+    title: 'Data Bank Soal',
+    shortDescription: {
+      id: 'Aplikasi web untuk mengelola dan menelusuri bank soal.',
+      en: 'A web application for managing and browsing a question bank.'
+    },
+    fullDescription: {
+      id: 'Alat bantu belajar yang mengumpulkan kumpulan soal dalam satu tempat sehingga mudah dicari dan dipakai berulang.',
+      en: 'A study aid that gathers question sets in one place so they are easy to search and reuse.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'Web Development',
+    tags: ['Web App', 'Education'],
+    technologies: ['TypeScript', 'React', 'Vercel'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2025-10-05',
+    status: 'Completed',
+    demoUrl: 'https://data-bank-soal.vercel.app',
+    repoUrl: 'https://github.com/FajarMelfiano/DATA-BANK-SOAL',
+    isFeatured: false,
+    order: 10,
+    views: 0
+  },
+  {
+    id: 'proj-11',
+    slug: 'portofolio-devira',
+    title: 'Portofolio Devira',
+    shortDescription: {
+      id: 'Situs portofolio pribadi yang dibuat untuk klien.',
+      en: 'A personal portfolio site built for a client.'
+    },
+    fullDescription: {
+      id: 'Website portofolio yang dirancang dan dideploy untuk klien, menampilkan profil, karya, dan informasi kontak.',
+      en: 'A portfolio website designed and deployed for a client, presenting their profile, work, and contact details.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'Web Development',
+    tags: ['TypeScript', 'React', 'Portfolio'],
+    technologies: ['TypeScript', 'React', 'Vercel'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2026-07-22',
+    status: 'Completed',
+    demoUrl: 'https://portofolio-devira.vercel.app',
+    repoUrl: 'https://github.com/FajarMelfiano/PORTOFOLIO-DEVIRA',
+    isFeatured: false,
+    order: 11,
+    views: 0
+  },
+  {
+    id: 'proj-12',
+    slug: 'mesin-kasir-python',
+    title: 'Mesin Kasir Python',
+    shortDescription: {
+      id: 'Aplikasi kasir sederhana berbasis Python untuk mencatat transaksi penjualan.',
+      en: 'A simple Python point-of-sale application for recording sales transactions.'
+    },
+    fullDescription: {
+      id: 'Program kasir yang menangani pencatatan barang, perhitungan total, dan struk transaksi — proyek awal saya dalam belajar Python.',
+      en: 'A cash register program handling item entry, total calculation, and receipts — one of my early Python learning projects.'
+    },
+    thumbnail: '',
+    gallery: [],
+    category: 'CLI & Automation',
+    tags: ['Python', 'CLI'],
+    technologies: ['Python'],
+    role: { id: 'Pengembang Tunggal', en: 'Sole Developer' },
+    completedDate: '2024-09-16',
+    status: 'Completed',
+    repoUrl: 'https://github.com/FajarMelfiano/Mesin-kasir-python',
+    isFeatured: false,
+    order: 12,
+    views: 0
   }
 ];
 
+/*
+ * The certificate folder on Google Drive requires sign-in, so only the two
+ * folder names were visible. Titles below reflect those names; fill in the
+ * issuer, dates, and file links from the admin panel.
+ */
 export const initialCertificates: Certificate[] = [
   {
     id: 'cert-1',
-    title: 'Google Cloud Professional Cloud Architect',
-    issuer: 'Google Cloud Training',
-    issuerLogo: 'https://picsum.photos/seed/gcp-badge/200/200',
-    issueDate: '2023-08-10',
-    expiryDate: '2026-08-10',
-    credentialId: 'GCP-PCA-98320491',
-    credentialUrl: 'https://www.credly.com',
-    thumbnailUrl: 'https://picsum.photos/seed/gcp-cert-thumb/800/600',
+    title: 'LKS Cloud Computing Tingkat Provinsi Jawa Timur 2026',
+    issuer: '', // TODO: isi penyelenggara resmi
+    issueDate: '2026-04-28',
+    credentialId: '',
+    credentialUrl: '',
+    thumbnailUrl: '',
+    fileUrl: '', // TODO: unggah berkas sertifikat lalu isi URL-nya
     description: {
-      id: 'Sertifikasi profesional tingkat lanjut untuk perancangan arsitektur sistem cloud yang aman, terisolasi, scalable, dan efisien biaya di Google Cloud Platform.',
-      en: 'Advanced professional certification for designing secure, resilient, scalable, and cost-effective cloud architectures on Google Cloud Platform.'
+      id: 'Sertifikat keikutsertaan Lomba Kompetensi Siswa bidang Cloud Computing tingkat Provinsi Jawa Timur tahun 2026.',
+      en: 'Certificate of participation in the 2026 East Java provincial student skills contest for Cloud Computing.'
     },
-    competencies: ['Cloud Architecture', 'GCP Compute & Storage', 'Security & Compliance', 'DevOps & Migration'],
-    category: 'Cloud Architecture',
+    competencies: ['Cloud Computing', 'AWS', 'Terraform', 'Infrastructure as Code'],
+    category: 'Cloud Computing',
     isValid: true,
     isFeatured: true,
     order: 1
   },
   {
     id: 'cert-2',
-    title: 'AWS Certified Solutions Architect – Associate',
-    issuer: 'Amazon Web Services',
-    issuerLogo: 'https://picsum.photos/seed/aws-badge/200/200',
-    issueDate: '2022-11-14',
-    expiryDate: '2025-11-14',
-    credentialId: 'AWS-ASA-88203912',
-    credentialUrl: 'https://www.credly.com',
-    thumbnailUrl: 'https://picsum.photos/seed/aws-cert-thumb/800/600',
+    title: 'LKS Cloud Computing Tingkat Kabupaten 2026',
+    issuer: '', // TODO: isi penyelenggara resmi
+    issueDate: '2026-04-28',
+    credentialId: '',
+    credentialUrl: '',
+    thumbnailUrl: '',
+    fileUrl: '', // TODO: unggah berkas sertifikat lalu isi URL-nya
     description: {
-      id: 'Validasi kemampuan merancang sistem terdistribusi pada infrastruktur Amazon Web Services.',
-      en: 'Validates expertise in designing distributed systems on Amazon Web Services infrastructure.'
+      id: 'Sertifikat keikutsertaan Lomba Kompetensi Siswa bidang Cloud Computing tingkat Kabupaten tahun 2026.',
+      en: 'Certificate of participation in the 2026 regency-level student skills contest for Cloud Computing.'
     },
-    competencies: ['AWS VPC & EC2', 'S3 & DynamoDB', 'IAM Security', 'Serverless Lambda'],
-    category: 'Cloud Architecture',
+    competencies: ['Cloud Computing', 'AWS'],
+    category: 'Cloud Computing',
     isValid: true,
     isFeatured: true,
     order: 2
-  },
-  {
-    id: 'cert-3',
-    title: 'Certified Kubernetes Administrator (CKA)',
-    issuer: 'The Linux Foundation & CNCF',
-    issuerLogo: 'https://picsum.photos/seed/cka-badge/200/200',
-    issueDate: '2023-03-22',
-    expiryDate: '2026-03-22',
-    credentialId: 'CKA-29019231',
-    credentialUrl: 'https://www.credly.com',
-    thumbnailUrl: 'https://picsum.photos/seed/cka-cert-thumb/800/600',
-    description: {
-      id: 'Kemampuan mengelola cluster Kubernetes, networking, storage, trobleshoot, dan deployment kontainer.',
-      en: 'Demonstrates ability to manage Kubernetes clusters, networking, storage, troubleshooting, and container deployments.'
-    },
-    competencies: ['Kubernetes Cluster Setup', 'Pod Security', 'Storage Volumes', 'Cluster Networking'],
-    category: 'DevOps & Containers',
-    isValid: true,
-    isFeatured: true,
-    order: 3
   }
 ];
 
@@ -519,305 +832,138 @@ export const initialAchievements: Achievement[] = [
   {
     id: 'ach-1',
     title: {
-      id: 'Juara 1 Indonesia AI Hackathon 2024 (Kategori Smart City)',
-      en: '1st Winner Indonesia AI Hackathon 2024 (Smart City Category)'
+      id: 'Lomba Kompetensi Siswa Cloud Computing — Tingkat Provinsi Jawa Timur 2026',
+      en: 'Student Skills Contest in Cloud Computing — East Java Province 2026'
     },
-    level: 'National',
-    organizer: 'Kementerian Komunikasi dan Informatika RI & Google',
-    date: '2024-05-18',
-    rank: 'Juara 1 (Gold Medal)',
+    level: 'Regional',
+    organizer: 'Lomba Kompetensi Siswa (LKS) Jawa Timur',
+    date: '2026-04-28',
+    rank: '', // TODO: isi peringkat yang diraih
     description: {
-      id: 'Mengembangkan sistem prediksi kemacetan lalu lintas berbasis sensor IoT dan AI Generatif untuk deteksi dini insiden jalan raya.',
-      en: 'Developed an IoT sensor & Generative AI congestion prediction platform for early highway incident alerts.'
+      id: 'Mewakili sekolah pada LKS bidang Cloud Computing tingkat provinsi, mengerjakan modul infrastructure as code dan pipeline machine learning di AWS.',
+      en: 'Represented the school at the provincial Cloud Computing skills contest, working on infrastructure-as-code and machine learning pipeline modules on AWS.'
     },
-    category: 'Hackathon & AI',
+    category: 'Kompetisi Cloud Computing',
     isFeatured: true,
     order: 1
   },
   {
     id: 'ach-2',
     title: {
-      id: 'Penghargaan Outstanding Software Engineer 2023',
-      en: 'Outstanding Software Engineer Award 2023'
+      id: 'Lomba Kompetensi Siswa Cloud Computing — Tingkat Kabupaten 2026',
+      en: 'Student Skills Contest in Cloud Computing — Regency Level 2026'
     },
-    level: 'Institutional',
-    organizer: 'Nusantara Global Tech',
-    date: '2023-12-20',
-    rank: 'Top Innovator',
+    level: 'Regional',
+    organizer: 'Lomba Kompetensi Siswa (LKS) Kabupaten Sidoarjo',
+    date: '2026-04-28',
+    rank: '', // TODO: isi peringkat yang diraih
     description: {
-      id: 'Dianugerahi sebagai insinyur terbaik atas pencapaian memodernisasi arsitektur monolith ke micro-services.',
-      en: 'Awarded top engineer honors for modernizing core monolith architecture into high-performing micro-services.'
+      id: 'Mengikuti seleksi LKS bidang Cloud Computing di tingkat kabupaten sebagai tahap menuju kompetisi provinsi.',
+      en: 'Competed in the regency-level Cloud Computing skills contest as the qualifying stage for the provincial round.'
     },
-    category: 'Corporate Award',
+    category: 'Kompetisi Cloud Computing',
     isFeatured: true,
     order: 2
   }
 ];
 
-export const initialOrganizations: Organization[] = [
-  {
-    id: 'org-1',
-    organizationName: 'Google Developer Group (GDG) Jakarta',
-    role: { id: 'Core Organizer & Tech Speaker', en: 'Core Organizer & Tech Speaker' },
-    period: '2022 - Sekarang',
-    location: 'Jakarta, Indonesia',
-    description: {
-      id: 'Mengorganisir seminar teknis, devfest, dan workshop rutin bulanan untuk 5.000+ anggota komunitas pengembang.',
-      en: 'Organizing monthly tech meetups, DevFests, and hands-on workshops for 5,000+ developer community members.'
-    },
-    responsibilities: [
-      { id: 'Menyusun materi workshop seputar Next.js dan GCP AI.', en: 'Curating technical tracks on Next.js and GCP AI.' },
-      { id: 'Menjadi pembicara dalam acara DevFest Jakarta 2023 & 2024.', en: 'Keynote speaker at DevFest Jakarta 2023 & 2024.' }
-    ],
-    achievements: [
-      { id: 'Meningkatkan partisipasi komunitas sebesar 120% YoY.', en: 'Increased developer meetup attendance by 120% YoY.' }
-    ],
-    order: 1
-  }
-];
+// TODO: isi bila Anda aktif di organisasi sekolah atau komunitas.
+export const initialOrganizations: Organization[] = [];
 
-export const initialTrainings: Training[] = [
-  {
-    id: 'trn-1',
-    trainingName: 'Advanced Microservices Architecture & Domain Driven Design',
-    organizer: 'O’Reilly Media & Tech Excellence',
-    date: '2024-02-15',
-    durationHours: 40,
-    instructor: 'Martin Fowler & Eric Evans Alumni Network',
-    skillsLearned: ['Domain Driven Design (DDD)', 'Event Sourcing', 'CQRS Pattern', 'Distributed Tracing'],
-    isCompleted: true,
-    order: 1
-  }
-];
+// TODO: isi bila Anda pernah mengikuti pelatihan atau kursus bersertifikat.
+export const initialTrainings: Training[] = [];
 
-export const initialPublications: Publication[] = [
-  {
-    id: 'pub-1',
-    title: 'Optimizing Multimodal Generative AI Retrieval for High-Throughput Web Applications',
-    authors: ['Oqii Febriansyah', 'Prof. Dr. Ir. S. Widodo', 'Dr. R. Haryanto'],
-    year: 2024,
-    abstract: {
-      id: 'Makalah ini mengusulkan teknik pengindeksan vektor adaptif baru yang memangkas waktu pemrosesan kueri dokumen hingga 68% tanpa mengorbankan akurasi kontekstual.',
-      en: 'This paper proposes a novel adaptive vector indexing method cutting document retrieval time by 68% without losing contextual accuracy.'
-    },
-    publisher: 'IEEE Xplore Transactions on Software Engineering',
-    journalName: 'IEEE Transactions on Software Engineering',
-    volumeNo: 'Vol. 30, No. 4',
-    doi: '10.1109/TSE.2024.309218',
-    keywords: ['Generative AI', 'Vector Search', 'RAG Architecture', 'Next.js', 'Distributed Systems'],
-    citationsCount: 42,
-    publicationType: 'Journal',
-    order: 1
-  }
-];
+// Tidak ada publikasi ilmiah — seksi ini bisa disembunyikan lewat Page Builder.
+export const initialPublications: Publication[] = [];
 
-export const initialTestimonials: Testimonial[] = [
-  {
-    id: 'test-1',
-    clientName: 'Budi Santoso',
-    avatarUrl: 'https://picsum.photos/seed/budi-avatar/200/200',
-    titleRole: 'Chief Technology Officer',
-    companyName: 'Fintech Nusantara Global',
-    content: {
-      id: 'Oqii adalah insinyur luar biasa. Ia berhasil memimpin transformasi platform kami dalam 4 bulan tanpa downtime tunggal. Kemampuan teknis dan kepemimpinannya sangat menonjol.',
-      en: 'Oqii is an extraordinary engineer. He led our platform overhaul in 4 months with zero downtime. His technical mastery and leadership are top-tier.'
-    },
-    rating: 5,
-    date: '2024-10-12',
-    isApproved: true,
-    order: 1
-  },
-  {
-    id: 'test-2',
-    clientName: 'Sarah Jenkins',
-    avatarUrl: 'https://picsum.photos/seed/sarah-avatar/200/200',
-    titleRole: 'VP of Product Development',
-    companyName: 'Apex Cloud Solutions USA',
-    content: {
-      id: 'Sangat terkesan dengan ketelitian, kecepatan komunikasi, dan kualitas kode yang dihasilkan Oqii. Sangat direkomendasikan untuk proyek enterprise!',
-      en: 'Incredibly impressed with Oqii’s attention to detail, communication speed, and code quality. Highly recommended for complex enterprise builds!'
-    },
-    rating: 5,
-    date: '2024-08-04',
-    isApproved: true,
-    order: 2
-  }
-];
+// TODO: minta testimoni dari pembimbing PKL atau klien, lalu tambahkan di sini.
+export const initialTestimonials: Testimonial[] = [];
 
 export const initialServices: Service[] = [
   {
     id: 'srv-1',
-    title: { id: 'Full-Stack Web Application Development', en: 'Full-Stack Web Application Development' },
+    title: { id: 'Pembuatan Website', en: 'Website Development' },
     icon: 'Code',
     shortDescription: {
-      id: 'Pengembangan situs web SaaS modern, dashboard analytics, dan portal e-commerce berbasis Next.js 15, TypeScript, dan Tailwind CSS.',
-      en: 'Building modern SaaS platforms, analytics dashboards, and e-commerce portals using Next.js 15, TypeScript, and Tailwind CSS.'
+      id: 'Pembuatan situs portofolio, landing page, dan aplikasi web sederhana memakai React dan Next.js.',
+      en: 'Building portfolio sites, landing pages, and simple web applications with React and Next.js.'
     },
-    startingPrice: '$1,500 USD',
-    duration: '2 - 6 Minggu',
+    startingPrice: '', // TODO: isi bila Anda ingin menampilkan harga
+    duration: '1 - 3 Minggu',
     deliverables: [
-      { id: 'Source code lengkap di GitHub', en: 'Complete clean source code repository' },
-      { id: 'Desain UI/UX responsif WCAG AA', en: 'Responsive WCAG AA compliant UI/UX' },
-      { id: 'Integrasi backend API & Database', en: 'Backend API & Database integration' },
-      { id: 'Deployment otomatis ke Cloud', en: 'Automated Cloud deployment setup' }
+      { id: 'Kode sumber lengkap di GitHub', en: 'Complete source code on GitHub' },
+      { id: 'Tampilan responsif untuk ponsel dan desktop', en: 'Responsive layout for mobile and desktop' },
+      { id: 'Deployment ke hosting (Vercel)', en: 'Deployment to hosting (Vercel)' }
     ],
     workflowSteps: [
-      { step: 1, title: 'Discovery & System Design', description: 'Memahami kebutuhan produk, riset, dan menyusun arsitektur data.' },
-      { step: 2, title: 'Agile Sprint Execution', description: 'Pengodean bertahap dengan demo berkala setiap minggu.' },
-      { step: 3, title: 'QA Testing & Cloud Launch', description: 'Pengujian performa, keamanan, SEO, dan peluncuran publik.' }
+      { step: 1, title: 'Diskusi Kebutuhan', description: 'Menentukan tujuan situs, isi, dan gaya tampilan.' },
+      { step: 2, title: 'Pengerjaan', description: 'Membangun halaman dan fungsionalitas sesuai kesepakatan.' },
+      { step: 3, title: 'Revisi & Peluncuran', description: 'Perbaikan akhir lalu situs dionlinekan.' }
     ],
-    faqs: [
-      {
-        question: { id: 'Apakah kode sepenuhnya milik klien?', en: 'Does the client own 100% of the code?' },
-        answer: { id: 'Ya, seluruh hak cipta dan repository dipindahtandatangkan langsung ke klien.', en: 'Yes, full copyright and repository ownership are transferred to you.' }
-      }
-    ],
+    faqs: [],
     isFeatured: true,
     order: 1
   },
   {
     id: 'srv-2',
-    title: { id: 'Generative AI Integration & RAG Engine', en: 'Generative AI Integration & RAG Engine' },
+    title: { id: 'Bot Otomasi WhatsApp & Telegram', en: 'WhatsApp & Telegram Automation Bots' },
     icon: 'Sparkles',
     shortDescription: {
-      id: 'Integrasi model Gemini AI, pencarian pengetahuan terdistribusi, chatbot cerdas, dan analisis teks dokumen perusahaan.',
-      en: 'Integrating Gemini AI models, custom knowledge vector retrieval, smart AI agents, and automated document processors.'
+      id: 'Pembuatan bot untuk balas otomatis, notifikasi, dan menjembatani percakapan antar platform.',
+      en: 'Building bots for auto-replies, notifications, and bridging conversations across platforms.'
     },
-    startingPrice: '$2,000 USD',
-    duration: '2 - 4 Minggu',
+    startingPrice: '', // TODO: isi bila Anda ingin menampilkan harga
+    duration: '1 - 2 Minggu',
     deliverables: [
-      { id: 'Server AI API Proxy terisolasi aman', en: 'Secure isolated AI API Proxy route' },
-      { id: 'Pipeline ekstraksi dokumen & vector DB', en: 'Document extraction pipeline & vector DB' },
-      { id: 'Antarmuka chat streaming interaktif', en: 'Interactive streaming chat interface' }
+      { id: 'Bot siap pakai beserta panduan menjalankan', en: 'A ready-to-run bot with setup instructions' },
+      { id: 'Kode sumber yang bisa dikembangkan sendiri', en: 'Source code you can extend yourself' }
     ],
     workflowSteps: [
-      { step: 1, title: 'Dataset Preparation', description: 'Penyiapan data dan penyesuaian prompt engineering.' },
-      { step: 2, title: 'Vector Pipeline & API Integration', description: 'Pembangunan RAG engine dan integrasi API route.' }
+      { step: 1, title: 'Perancangan Alur', description: 'Menentukan perintah dan alur balasan bot.' },
+      { step: 2, title: 'Pembuatan & Uji Coba', description: 'Membangun bot lalu mengujinya pada perangkat nyata.' }
     ],
-    faqs: [
-      {
-        question: { id: 'Apakah data internal saya aman?', en: 'Is my internal company data safe?' },
-        answer: { id: 'Sangat aman. Seluruh data diproses secara terisolasi tanpa disimpan untuk pelatihan umum AI.', en: '100% safe. Data is processed in an isolated environment and never used for public AI training.' }
-      }
-    ],
+    faqs: [],
     isFeatured: true,
     order: 2
+  },
+  {
+    id: 'srv-3',
+    title: { id: 'Servis Perangkat Mobile', en: 'Mobile Device Repair' },
+    icon: 'Server',
+    shortDescription: {
+      id: 'Servis hardware dan software perangkat Android maupun iPhone: flashing, unlock, ganti sparepart, dan troubleshooting.',
+      en: 'Hardware and software repair for Android and iPhone devices: flashing, unlocking, part replacement, and troubleshooting.'
+    },
+    startingPrice: '',
+    duration: 'Menyesuaikan kerusakan',
+    deliverables: [
+      { id: 'Diagnosa kerusakan', en: 'Fault diagnosis' },
+      { id: 'Perbaikan hardware atau software', en: 'Hardware or software repair' }
+    ],
+    workflowSteps: [
+      { step: 1, title: 'Pemeriksaan', description: 'Mengecek kondisi perangkat dan menentukan penyebab kerusakan.' },
+      { step: 2, title: 'Perbaikan', description: 'Melakukan perbaikan sesuai hasil pemeriksaan.' }
+    ],
+    faqs: [],
+    isFeatured: false,
+    order: 3
   }
 ];
 
-export const initialBlogPosts: BlogPost[] = [
-  {
-    id: 'post-1',
-    slug: 'panduan-arsitektur-nextjs-15-enterprise',
-    title: {
-      id: 'Panduan Lengkap Arsitektur Next.js 15 App Router untuk Aplikasi Enterprise',
-      en: 'Complete Guide to Next.js 15 App Router Architecture for Enterprise Applications'
-    },
-    excerpt: {
-      id: 'Pelajari cara menyusun folder modular, mengoptimalkan Server Components, mengelola global state, dan meningkatkan skor Lighthouse hingga 99.',
-      en: 'Learn how to structure modular folders, optimize Server Components, manage global state, and reach a 99 Lighthouse score.'
-    },
-    contentMarkdown: {
-      id: `# Panduan Next.js 15 App Router Enterprise\n\nNext.js 15 membawa era baru dalam pengembangan aplikasi web modern dengan memperkenalkan Server Components yang sangat dioptimalkan, Turbopack, dan Server Actions yang aman.\n\n## 1. Pemisahan Folder Modular\n\nSelalu pisahkan logika bisnis dari UI component untuk memastikan keterbacaan kode yang tinggi:\n\n- \`components/ui\` : Komponen atomic murni (button, badge, dialog)\n- \`features/\` : Fitur berlingkup domain (profile, project, analytics)\n- \`lib/\` : Utility, helper, dan database client\n\n## 2. Praktik Terbaik Gemini AI Integration\n\nPastikan seluruh API key seperti \`GEMINI_API_KEY\` diakses secara eksplisit dari sisi server di Next.js API Routes (\`/app/api/*\`) untuk mencegah kebocoran kredensial di browser.`,
-      en: `# Complete Next.js 15 Enterprise Guide\n\nNext.js 15 represents a major leap forward for modern web development, offering ultra-optimized Server Components, Turbopack, and secure Server Actions.\n\n## 1. Modular Architecture Pattern\n\nAlways decouple business logic from UI elements:\n\n- \`components/ui\`: Pure atomic elements (buttons, badges, modals)\n- \`features/\`: Domain-scoped functional blocks\n- \`lib/\`: Utilities, state store, and clients\n\n## 2. Gemini AI Integration Best Practices\n\nAlways proxy your \`GEMINI_API_KEY\` through server-side API Routes (\`/app/api/*\`) to ensure zero key exposure to client browser DevTools.`
-    },
-    coverImage: 'https://picsum.photos/seed/blog-nextjs15/1200/800',
-    category: 'Engineering',
-    tags: ['Next.js 15', 'React 19', 'TypeScript', 'Web Architecture'],
-    readTimeMinutes: 6,
-    publishedAt: '2024-11-01',
-    isPublished: true,
-    isDraft: false,
-    views: 1840,
-    likes: 128,
-    commentsCount: 14
-  },
-  {
-    id: 'post-2',
-    slug: 'mengapa-rag-dan-gemini-3-5-mengubah-lanskap-saas',
-    title: {
-      id: 'Mengapa RAG dan Gemini 3.5 AI Mengubah Lanskap Aplikasi SaaS Modern',
-      en: 'Why RAG and Gemini 3.5 AI Are Revolutionizing Modern SaaS Platforms'
-    },
-    excerpt: {
-      id: 'Analisis mendalam bagaimana teknik Retrieval-Augmented Generation memungkinkan aplikasi menjawab pertanyaan kompleks langsung dari basis data internal.',
-      en: 'Deep dive into how Retrieval-Augmented Generation techniques allow applications to answer complex queries directly from internal databases.'
-    },
-    contentMarkdown: {
-      id: `# Lanskap Baru AI dalam SaaS Enterprise\n\nInovasi AI Generatif bukan lagi sekadar fitur hiburan, melainkan pilar utama pengolahan informasi enterprise.\n\nDengan memanfaatkan model Gemini AI dan arsitektur RAG, pengguna dapat menemukan informasi dari ribuan berkas dokumen hanya dalam hitungan detik.`,
-      en: `# The New Frontier of AI in Enterprise SaaS\n\nGenerative AI is no longer a gimmick; it has become the core infrastructure of modern knowledge processing.\n\nBy leveraging Gemini AI models and RAG architectures, users can surface contextual answers from thousands of documents in seconds.`
-    },
-    coverImage: 'https://picsum.photos/seed/blog-rag-ai/1200/800',
-    category: 'Artificial Intelligence',
-    tags: ['Gemini AI', 'RAG', 'Vector Database', 'SaaS'],
-    readTimeMinutes: 8,
-    publishedAt: '2024-10-18',
-    isPublished: true,
-    isDraft: false,
-    views: 2410,
-    likes: 215,
-    commentsCount: 22
-  }
-];
+// TODO: tulis artikel pertama Anda lewat panel admin.
+export const initialBlogPosts: BlogPost[] = [];
 
-export const initialGallery: GalleryItem[] = [
-  {
-    id: 'gal-1',
-    title: { id: 'Pembicara Keynote di GDG DevFest Jakarta 2024', en: 'Keynote Speaker at GDG DevFest Jakarta 2024' },
-    category: 'Seminars',
-    mediaUrl: 'https://picsum.photos/seed/devfest-speaker/1200/800',
-    mediaType: 'image',
-    caption: { id: 'Membawakan materi tentang Modern Web Performance & Gemini AI Integration di hadapan 1,200+ pengembang.', en: 'Presenting on Modern Web Performance & Gemini AI Integration in front of 1,200+ developers.' },
-    date: '2024-11-20'
-  },
-  {
-    id: 'gal-2',
-    title: { id: 'Tim Pemenang Hackathon AI Kominfo 2024', en: 'Winning Team at Kominfo AI Hackathon 2024' },
-    category: 'Events',
-    mediaUrl: 'https://picsum.photos/seed/hackathon-winner/1200/800',
-    mediaType: 'image',
-    caption: { id: 'Momen penganugerahan piala Juara 1 Nasional oleh Menteri Kominfo RI.', en: 'Receiving 1st Place National Trophy presented by the Minister of Communication & IT.' },
-    date: '2024-05-18'
-  },
-  {
-    id: 'gal-3',
-    title: { id: 'Workshop Code Review & Architecture di Kantor', en: 'Engineering Architecture Workshop at HQ' },
-    category: 'Work',
-    mediaUrl: 'https://picsum.photos/seed/workshop-office/1200/800',
-    mediaType: 'image',
-    caption: { id: 'Sesi mentoring arsitektur micro-services untuk tim insinyur perangkat lunak muda.', en: 'Mentoring session on micro-services architecture for junior software engineers.' },
-    date: '2024-03-12'
-  }
-];
+// TODO: unggah dokumentasi kegiatan, lomba, atau PKL lewat panel admin.
+export const initialGallery: GalleryItem[] = [];
 
-export const initialCVVersions: CVVersion[] = [
-  {
-    id: 'cv-1',
-    versionName: 'Oqii_Febriansyah_CV_Senior_Software_Engineer_2025.pdf',
-    language: 'en',
-    type: 'Professional',
-    fileUrl: '/assets/sample-cv.pdf',
-    uploadedAt: '2025-01-10',
-    isActive: true,
-    downloadCount: 342
-  },
-  {
-    id: 'cv-2',
-    versionName: 'Oqii_Febriansyah_CV_Bahasa_Indonesia_ATS_2025.pdf',
-    language: 'id',
-    type: 'ATS-Friendly',
-    fileUrl: '/assets/sample-cv-id.pdf',
-    uploadedAt: '2025-01-08',
-    isActive: true,
-    downloadCount: 218
-  }
-];
+// TODO: unggah berkas CV ke folder public/ lalu daftarkan di sini.
+export const initialCVVersions: CVVersion[] = [];
 
 export const initialThemeSettings: ThemeSettings = {
   primaryColor: '#ffffff',
   secondaryColor: '#0f0f0f',
-  accentColor: '#a1a1aa',
-  fontFamily: 'Playfair Display',
+  accentColor: '#38bdf8',
+  fontFamily: 'Plus Jakarta Sans',
   borderRadius: 'sm',
   buttonStyle: 'rounded',
   cardStyle: 'bordered',
@@ -827,26 +973,29 @@ export const initialThemeSettings: ThemeSettings = {
 };
 
 export const initialSEOSettings: SEOSettings = {
-  metaTitle: 'Oqii Febriansyah | Senior Full Stack Engineer & Cloud Architect',
-  metaDescription: 'Personal portfolio of Oqii Febriansyah - Senior Full Stack Engineer specializing in Next.js 15, Cloud Architecture, and Gemini AI integration.',
-  keywords: 'Oqii Febriansyah, Portfolio, Full Stack Engineer, Next.js Developer, Cloud Architect, AI Developer, Jakarta Software Engineer',
-  ogImage: 'https://picsum.photos/seed/oqii-og/1200/630',
-  authorName: 'Oqii Febriansyah',
-  canonicalUrl: 'https://oqiifebriansyah.dev',
-  googleAnalyticsId: 'G-MEASUREMENT_ID',
-  googleSearchConsoleMeta: 'google-site-verification-token',
-  robotsTxt: 'User-agent: *\nAllow: /\nSitemap: https://oqiifebriansyah.dev/sitemap.xml'
+  metaTitle: 'Fajar Melfiano | Pelajar SMK & Cloud Computing Enthusiast',
+  metaDescription:
+    'Portofolio Fajar Melfiano Obese Afoan Toan — pelajar SMK Krian 1 Sidoarjo yang menekuni Linux, otomasi, pengembangan web, dan cloud computing.',
+  keywords:
+    'Fajar Melfiano, Melfiano, portofolio, SMK Krian 1 Sidoarjo, cloud computing, Linux, Terraform, AWS, web developer Sidoarjo',
+  ogImage: '', // TODO: siapkan gambar 1200x630 lalu isi URL-nya
+  authorName: 'Fajar Melfiano Obese Afoan Toan',
+  canonicalUrl: 'https://www.melfiano.tech',
+  googleAnalyticsId: '',
+  googleSearchConsoleMeta: '',
+  robotsTxt: 'User-agent: *\nAllow: /\nSitemap: https://www.melfiano.tech/sitemap.xml'
 };
 
 export const initialSystemSettings: SystemSettings = {
   adminRoute: '/secure-control-panel',
-  enableWhatsAppButton: true,
-  whatsAppNumber: '6281234567890',
-  whatsAppDefaultMessage: 'Halo Oqii, saya melihat portofolio profesional Anda dan ingin berdiskusi mengenai proyek.',
+  enableWhatsAppButton: false, // dinyalakan setelah nomor WhatsApp asli diisi
+  whatsAppNumber: '',
+  whatsAppDefaultMessage:
+    'Halo Fajar, saya melihat portofolio Anda dan ingin berdiskusi mengenai sebuah proyek.',
   enableMaintenanceMode: false,
-  maintenanceMessage: 'Website sedang dalam pemeliharaan berkala. Silakan kembali beberapa saat lagi.',
+  maintenanceMessage: 'Situs sedang dalam pemeliharaan. Silakan kembali beberapa saat lagi.',
   enableCommandPalette: true,
-  enableVisitorCounter: true,
+  enableVisitorCounter: false,
   enableCustomCursor: false,
   enableAudioSynthesizer: false,
   enableMultiLanguage: true,
@@ -862,86 +1011,33 @@ export const initialPageSections: PageSectionConfig[] = [
   { id: 'sec-projects', name: 'Proyek Unggulan (Projects)', key: 'projects', isVisible: true, order: 6 },
   { id: 'sec-certs', name: 'Sertifikat (Certificates)', key: 'certificates', isVisible: true, order: 7 },
   { id: 'sec-achievements', name: 'Prestasi & Penghargaan', key: 'achievements', isVisible: true, order: 8 },
-  { id: 'sec-org', name: 'Organisasi & Komunitas', key: 'organization', isVisible: true, order: 9 },
-  { id: 'sec-trainings', name: 'Pelatihan & Kursus', key: 'trainings', isVisible: true, order: 10 },
-  { id: 'sec-publications', name: 'Publikasi & Karya', key: 'publications', isVisible: true, order: 11 },
+  { id: 'sec-org', name: 'Organisasi & Komunitas', key: 'organization', isVisible: false, order: 9 },
+  { id: 'sec-trainings', name: 'Pelatihan & Kursus', key: 'trainings', isVisible: false, order: 10 },
+  { id: 'sec-publications', name: 'Publikasi & Karya', key: 'publications', isVisible: false, order: 11 },
   { id: 'sec-services', name: 'Layanan Profesional', key: 'services', isVisible: true, order: 12 },
-  { id: 'sec-blog', name: 'Artikel & Blog', key: 'blog', isVisible: true, order: 13 },
-  { id: 'sec-testimonials', name: 'Testimoni Klien', key: 'testimonials', isVisible: true, order: 14 },
-  { id: 'sec-gallery', name: 'Galeri Dokumentasi', key: 'gallery', isVisible: true, order: 15 },
+  { id: 'sec-blog', name: 'Artikel & Blog', key: 'blog', isVisible: false, order: 13 },
+  { id: 'sec-testimonials', name: 'Testimoni Klien', key: 'testimonials', isVisible: false, order: 14 },
+  { id: 'sec-gallery', name: 'Galeri Dokumentasi', key: 'gallery', isVisible: false, order: 15 },
   { id: 'sec-cv', name: 'Pratinjau CV Interaktif', key: 'cv', isVisible: true, order: 16 },
   { id: 'sec-contact', name: 'Formulir Kontak', key: 'contact', isVisible: true, order: 17 }
 ];
 
-export const initialAuditLogs: AuditLog[] = [
-  {
-    id: 'log-1',
-    adminEmail: 'oqiifebriansyah@gmail.com',
-    action: 'LOGIN_SUCCESS',
-    module: 'Authentication',
-    details: 'Berhasil login ke Admin Panel menggunakan 2FA OTP verification.',
-    ipAddress: '182.253.120.45',
-    timestamp: '2026-07-21T16:45:00Z'
-  },
-  {
-    id: 'log-2',
-    adminEmail: 'oqiifebriansyah@gmail.com',
-    action: 'UPDATE_PROJECT',
-    module: 'Projects',
-    details: 'Memperbarui informasi proyek "NexusAI - Enterprise Knowledge Base Platform".',
-    ipAddress: '182.253.120.45',
-    timestamp: '2026-07-21T17:05:12Z'
-  }
-];
+export const initialAuditLogs: AuditLog[] = [];
 
 export const initialAnalytics: AnalyticsSummary = {
-  totalVisitors: 14850,
-  todayVisitors: 284,
-  monthlyVisitors: 3910,
-  cvDownloads: 560,
-  totalProjectViews: 12400,
-  messagesCount: 48,
-  deviceBreakdown: { desktop: 68, mobile: 28, tablet: 4 },
-  browserBreakdown: { chrome: 62, safari: 21, firefox: 9, edge: 6, other: 2 },
-  topVisitedProjects: [
-    { title: 'NexusAI - Enterprise Knowledge Base Platform', views: 1420 },
-    { title: 'FinFlow - Omnichannel Financial Analytics', views: 980 },
-    { title: 'MediCare - Integrated Healthcare System', views: 850 }
-  ],
-  topVisitedArticles: [
-    { title: 'Panduan Lengkap Arsitektur Next.js 15 App Router untuk Aplikasi Enterprise', views: 1840 },
-    { title: 'Mengapa RAG dan Gemini 3.5 AI Mengubah Lanskap Aplikasi SaaS Modern', views: 2410 }
-  ],
-  visitorTrend: [
-    { date: '15 Jul', views: 210 },
-    { date: '16 Jul', views: 245 },
-    { date: '17 Jul', views: 198 },
-    { date: '18 Jul', views: 310 },
-    { date: '19 Jul', views: 275 },
-    { date: '20 Jul', views: 320 },
-    { date: '21 Jul', views: 284 }
-  ]
+  totalVisitors: 0,
+  todayVisitors: 0,
+  monthlyVisitors: 0,
+  cvDownloads: 0,
+  totalProjectViews: 0,
+  messagesCount: 0,
+  deviceBreakdown: { desktop: 0, mobile: 0, tablet: 0 },
+  browserBreakdown: { chrome: 0, safari: 0, firefox: 0, edge: 0, other: 0 },
+  topVisitedProjects: [],
+  topVisitedArticles: [],
+  visitorTrend: []
 };
 
-export const initialMessages: ContactMessage[] = [
-  {
-    id: 'msg-1',
-    senderName: 'Rian Hidayat',
-    senderEmail: 'rian.hidayat@techcorp.id',
-    senderPhone: '+628119876543',
-    subject: 'Penawaran Kerjasama Proyek Cloud & AI Integration',
-    serviceType: 'Generative AI Integration',
-    message: 'Halo Mas Oqii, kami terkesan dengan portofolio Anda di bidang Gemini RAG. Apakah ada waktu luang minggu ini untuk diskusi konsultasi arsitektur?',
-    receivedAt: '2026-07-21T10:15:00Z',
-    status: 'Unread'
-  }
-];
+export const initialMessages: ContactMessage[] = [];
 
-export const initialSubscribers: Subscriber[] = [
-  {
-    id: 'sub-1',
-    email: 'dev.fan@example.com',
-    subscribedAt: '2026-06-12T08:00:00Z',
-    isActive: true
-  }
-];
+export const initialSubscribers: Subscriber[] = [];
