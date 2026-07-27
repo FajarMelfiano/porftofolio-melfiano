@@ -7,7 +7,7 @@ import { BookOpen, Eye, Heart } from 'lucide-react';
 import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput, Toggle,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
-  BilingualText, BilingualArea, TagsInput, useArmedDelete, DeleteConfirmBar
+  BilingualText, BilingualArea, TagsInput, useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const slugify = (s: string) =>
@@ -181,7 +181,12 @@ export const AdminBlogManager: React.FC = () => {
 
             <FormSection title="Media & Metadata">
               <Field label="URL Gambar Sampul" required>
-                <TextInput required value={form.coverImage} onChange={v => set('coverImage', v)} />
+                <ImageUploader
+                  label="Gambar Sampul (Cover)"
+                  value={form.coverImage}
+                  onChange={v => set('coverImage', v)}
+                  folder="blog"
+                />
               </Field>
               {form.coverImage && (
                 // eslint-disable-next-line @next/next/no-img-element

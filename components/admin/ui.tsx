@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Plus, Trash2, Edit2, Check, X, ArrowUp, ArrowDown, Inbox } from 'lucide-react';
+import { Plus, Trash2, Edit2, Check, X, ArrowUp, ArrowDown, Inbox, UploadCloud, Loader2 } from 'lucide-react';
+import { uploadFile } from '@/lib/supabase';
 
 /**
  * Shared building blocks for the admin panels.
@@ -244,6 +245,82 @@ export const ColorInput: React.FC<{ value: string; onChange: (v: string) => void
     />
   </div>
 );
+
+export function ImageUploader({
+  label,
+  value,
+  onChange,
+  folder = 'general',
+  accept = 'image/*',
+  helperText
+}: {
+  label: string;
+  value?: string;
+  onChange: (url: string) => void;
+  folder?: string;
+  accept?: string;
+  helperText?: string;
+}) {
+  const [isUploading, setIsUploading] = React.useState(false);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const url = await uploadFile(file, folder);
+    setIsUploading(false);
+
+    if (url) {
+      onChange(url);
+    } else {
+      alert('Gagal mengunggah file. Periksa koneksi atau ukuran file.');
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 font-bold">{label}</label>
+      {value ? (
+        <div className="relative w-full max-w-sm overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
+          {value.match(/\.(mp4|webm|mov)$/i) ? (
+            <video src={value} className="w-full h-auto object-cover" controls />
+          ) : (
+            <img src={value} alt="Preview" className="w-full h-40 object-cover" />
+          )}
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            className="absolute top-2 right-2 p-1.5 bg-black/60 text-white rounded-lg hover:bg-rose-500 transition-colors backdrop-blur-sm"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      ) : (
+        <label className="relative flex flex-col items-center justify-center w-full max-w-sm h-40 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-900/50 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-colors group">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
+            {isUploading ? (
+              <Loader2 className="w-8 h-8 text-blue-500 animate-spin mb-3" />
+            ) : (
+              <UploadCloud className="w-8 h-8 text-slate-400 group-hover:text-blue-500 mb-3 transition-colors" />
+            )}
+            <p className="mb-1 text-sm text-slate-600 dark:text-slate-400">
+              <span className="font-semibold text-blue-500">Klik untuk unggah</span> atau drag & drop
+            </p>
+            <p className="text-xs text-slate-500">{helperText || `Maks. 5MB (${accept})`}</p>
+          </div>
+          <input
+            type="file"
+            className="hidden"
+            accept={accept}
+            onChange={handleFile}
+            disabled={isUploading}
+          />
+        </label>
+      )}
+    </div>
+  );
+}
 
 // ------------------------------------------------------------- bilingual ---
 

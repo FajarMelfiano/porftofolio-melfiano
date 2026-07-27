@@ -8,7 +8,7 @@ import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput, Select, Toggle,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
   BilingualText, BilingualArea, BilingualListEditor, TagsInput, StringListEditor,
-  useArmedDelete, DeleteConfirmBar
+  useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const STATUSES = [
@@ -250,7 +250,12 @@ export const AdminProjectsManager: React.FC = () => {
 
             <FormSection title="Media">
               <Field label="URL Thumbnail" required>
-                <TextInput required value={form.thumbnail} onChange={v => set('thumbnail', v)} />
+                <ImageUploader
+                  label="Thumbnail Utama"
+                  value={form.thumbnail}
+                  onChange={v => set('thumbnail', v)}
+                  folder="projects"
+                />
               </Field>
               {form.thumbnail && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -269,7 +274,13 @@ export const AdminProjectsManager: React.FC = () => {
                 />
               </Field>
               <Field label="URL Video">
-                <TextInput value={form.videoUrl ?? ''} onChange={v => set('videoUrl', v)} />
+                <ImageUploader
+                  label="Video Demo (Opsional)"
+                  value={form.videoUrl ?? ''}
+                  onChange={v => set('videoUrl', v)}
+                  folder="projects"
+                  accept="video/*"
+                />
               </Field>
             </FormSection>
 

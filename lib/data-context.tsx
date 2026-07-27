@@ -1,7 +1,7 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { doc, getDoc, updateDoc, setDoc, onSnapshot } from 'firebase/firestore';
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -293,81 +293,105 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // seed data and overwrites saved data before the async load finishes.
   const [isHydrated, setIsHydrated] = useState<boolean>(false);
 
-  // Restore persisted state on mount
+  // Firestore ref
+  const cmsDocRef = doc(db, 'portfolio', 'cms_data');
+
+  // Track latest state to sync back to Firestore
+  const stateRef = useRef({
+    profile, heroConfig, skillCategories, skills, experiences, educations, projects,
+    certificates, achievements, organizations, trainings, publications,
+    testimonials, services, blogPosts, gallery, cvVersions, messages,
+    subscribers, themeSettings, seoSettings, systemSettings, pageSections, auditLogs, analytics
+  });
+
   useEffect(() => {
-    let hadLocalSnapshot = false;
-    let hadStaleSnapshot = false;
+    stateRef.current = {
+      profile, heroConfig, skillCategories, skills, experiences, educations, projects,
+      certificates, achievements, organizations, trainings, publications,
+      testimonials, services, blogPosts, gallery, cvVersions, messages,
+      subscribers, themeSettings, seoSettings, systemSettings, pageSections, auditLogs, analytics
+    };
+  }, [
+    profile, heroConfig, skillCategories, skills, experiences, educations, projects,
+    certificates, achievements, organizations, trainings, publications,
+    testimonials, services, blogPosts, gallery, cvVersions, messages,
+    subscribers, themeSettings, seoSettings, systemSettings, pageSections, auditLogs, analytics
+  ]);
 
-    const timer = setTimeout(async () => {
-      try {
-        const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-        const parsed = saved ? JSON.parse(saved) : null;
+  const syncToFirestore = async (updates: Partial<typeof stateRef.current>) => {
+    try {
+      await updateDoc(cmsDocRef, updates as any);
+    } catch (e) {
+      console.error('Failed to sync to Firestore', e);
+    }
+  };
 
-        if (parsed && parsed.__version !== DATA_VERSION) {
-          // Snapshot predates the current seed. Discard it rather than let it
-          // shadow the new content, and remember it existed so the Firestore
-          // step below doesn't resurrect an equally stale profile.
-          localStorage.removeItem(LOCAL_STORAGE_KEY);
-          hadStaleSnapshot = true;
-        } else if (parsed) {
-          hadLocalSnapshot = true;
-          // Each entity is restored only when present, so a backup written by
-          // an older build never blanks out entities it didn't know about.
-          if (parsed.profile) setProfile(parsed.profile);
-          if (parsed.heroConfig) setHeroConfig(parsed.heroConfig);
-          if (parsed.skillCategories) setSkillCategories(parsed.skillCategories);
-          if (parsed.skills) setSkills(parsed.skills);
-          if (parsed.experiences) setExperiences(parsed.experiences);
-          if (parsed.educations) setEducations(parsed.educations);
-          if (parsed.projects) setProjects(parsed.projects);
-          if (parsed.certificates) setCertificates(parsed.certificates);
-          if (parsed.achievements) setAchievements(parsed.achievements);
-          if (parsed.organizations) setOrganizations(parsed.organizations);
-          if (parsed.trainings) setTrainings(parsed.trainings);
-          if (parsed.publications) setPublications(parsed.publications);
-          if (parsed.testimonials) setTestimonials(parsed.testimonials);
-          if (parsed.services) setServices(parsed.services);
-          if (parsed.blogPosts) setBlogPosts(parsed.blogPosts);
-          if (parsed.gallery) setGallery(parsed.gallery);
-          if (parsed.cvVersions) setCvVersions(parsed.cvVersions);
-          if (parsed.messages) setMessages(parsed.messages);
-          if (parsed.subscribers) setSubscribers(parsed.subscribers);
-          if (parsed.themeSettings) setThemeSettings(parsed.themeSettings);
-          if (parsed.seoSettings) setSeoSettings(parsed.seoSettings);
-          if (parsed.systemSettings) setSystemSettings(parsed.systemSettings);
-          if (parsed.pageSections) setPageSections(parsed.pageSections);
-          if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
-          if (parsed.analytics) setAnalytics(parsed.analytics);
-        }
-      } catch (e) {
-        console.error('Failed to restore local data', e);
+  // Restore persisted state on mount from Firestore
+  useEffect(() => {
+    const unsubscribe = onSnapshot(cmsDocRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        if (data.profile) setProfile(data.profile);
+        if (data.heroConfig) setHeroConfig(data.heroConfig);
+        if (data.skillCategories) setSkillCategories(data.skillCategories);
+        if (data.skills) setSkills(data.skills);
+        if (data.experiences) setExperiences(data.experiences);
+        if (data.educations) setEducations(data.educations);
+        if (data.projects) setProjects(data.projects);
+        if (data.certificates) setCertificates(data.certificates);
+        if (data.achievements) setAchievements(data.achievements);
+        if (data.organizations) setOrganizations(data.organizations);
+        if (data.trainings) setTrainings(data.trainings);
+        if (data.publications) setPublications(data.publications);
+        if (data.testimonials) setTestimonials(data.testimonials);
+        if (data.services) setServices(data.services);
+        if (data.blogPosts) setBlogPosts(data.blogPosts);
+        if (data.gallery) setGallery(data.gallery);
+        if (data.cvVersions) setCvVersions(data.cvVersions);
+        if (data.messages) setMessages(data.messages);
+        if (data.subscribers) setSubscribers(data.subscribers);
+        if (data.themeSettings) setThemeSettings(data.themeSettings);
+        if (data.seoSettings) setSeoSettings(data.seoSettings);
+        if (data.systemSettings) setSystemSettings(data.systemSettings);
+        if (data.pageSections) setPageSections(data.pageSections);
+        if (data.auditLogs) setAuditLogs(data.auditLogs);
+        if (data.analytics) setAnalytics(data.analytics);
+        setIsHydrated(true);
+      } else {
+        const initialData = {
+           profile: initialProfile,
+           heroConfig: initialHeroConfig,
+           skillCategories: initialSkillCategories,
+           skills: initialSkills,
+           experiences: initialExperiences,
+           educations: initialEducations,
+           projects: initialProjects,
+           certificates: initialCertificates,
+           achievements: initialAchievements,
+           organizations: initialOrganizations,
+           trainings: initialTrainings,
+           publications: initialPublications,
+           testimonials: initialTestimonials,
+           services: initialServices,
+           blogPosts: initialBlogPosts,
+           gallery: initialGallery,
+           cvVersions: initialCVVersions,
+           messages: initialMessages,
+           subscribers: initialSubscribers,
+           themeSettings: initialThemeSettings,
+           seoSettings: initialSEOSettings,
+           systemSettings: initialSystemSettings,
+           pageSections: initialPageSections,
+           auditLogs: initialAuditLogs,
+           analytics: initialAnalytics
+        };
+        setDoc(cmsDocRef, initialData).then(() => setIsHydrated(true));
       }
+    }, (error) => {
+        console.error('Snapshot listener error:', error);
+    });
 
-      // Firestore currently stores only the profile document, so it can't be
-      // the source of truth for the site. It is used as a first-run fallback
-      // only: pulling it in on every load would reintroduce the same bug the
-      // version check above fixes, just from a remote stale copy instead.
-      if (!hadLocalSnapshot && !hadStaleSnapshot) {
-        try {
-          const docRef = doc(db, 'portfolio', 'profile');
-          const docSnap = await getDoc(docRef);
-
-          if (docSnap.exists()) {
-            setProfile(docSnap.data() as ProfileInfo);
-          } else {
-            await setDoc(docRef, initialProfile);
-          }
-        } catch (e) {
-          // Security rules deny unauthenticated access, which is expected —
-          // the seed data already rendered, so there is nothing to recover.
-          console.debug('Firestore profile unavailable, using local seed', e);
-        }
-      }
-
-      setIsHydrated(true);
-    }, 0);
-
-    return () => clearTimeout(timer);
+    return () => unsubscribe();
   }, []);
 
   // Firebase owns the session — it persists and restores it across reloads,
@@ -385,50 +409,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
     return () => unsubscribe();
   }, []);
-
-  // Save to local storage on changes
-  useEffect(() => {
-    if (!isHydrated) return;
-    try {
-      const dataToSave = {
-        __version: DATA_VERSION,
-        profile,
-        heroConfig,
-        skillCategories,
-        skills,
-        experiences,
-        educations,
-        projects,
-        certificates,
-        achievements,
-        organizations,
-        trainings,
-        publications,
-        testimonials,
-        services,
-        blogPosts,
-        gallery,
-        cvVersions,
-        messages,
-        subscribers,
-        themeSettings,
-        seoSettings,
-        systemSettings,
-        pageSections,
-        auditLogs,
-        analytics,
-      };
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dataToSave));
-    } catch (e) {
-      console.error('Failed to save to local storage', e);
-    }
-  }, [
-    isHydrated,
-    profile, heroConfig, skillCategories, skills, experiences, educations, projects,
-    certificates, achievements, organizations, trainings, publications,
-    testimonials, services, blogPosts, gallery, cvVersions, messages,
-    subscribers, themeSettings, seoSettings, systemSettings, pageSections, auditLogs, analytics
-  ]);
 
   // Adopt whatever the pre-paint script in the layout already applied, so the
   // toggle icon matches the theme actually on screen.
@@ -454,7 +434,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const toggleDarkMode = () => {
     setIsDarkMode(prev => {
       const next = !prev;
-      setThemeSettings(current => ({ ...current, mode: next ? 'dark' : 'light' }));
+      const newSettings = { ...themeSettings, mode: (next ? 'dark' : 'light') as 'dark' | 'light' | 'system' };
+      setThemeSettings(newSettings);
+      syncToFirestore({ themeSettings: newSettings });
       return next;
     });
   };
@@ -469,7 +451,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ipAddress: '127.0.0.1 (Session)',
       timestamp: new Date().toISOString()
     };
-    setAuditLogs(prev => [newLog, ...prev]);
+    const nextLogs = [newLog, ...stateRef.current.auditLogs];
+    setAuditLogs(nextLogs);
+    syncToFirestore({ auditLogs: nextLogs });
   };
 
   const loginAdmin = async (email: string, pass: string): Promise<{ ok: boolean; error?: string }> => {
@@ -500,284 +484,383 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (data: Partial<ProfileInfo>) => {
     const newProfile = { ...profile, ...data };
     setProfile(newProfile);
-    try {
-        await updateDoc(doc(db, 'portfolio', 'profile'), newProfile as any);
-    } catch (e) {
-        console.error('Failed to update profile in Firestore', e);
-    }
+    await syncToFirestore({ profile: newProfile });
     addAuditLog('UPDATE_PROFILE', 'Profile', 'Profile information updated');
   };
 
   const updateHeroConfig = (data: Partial<HeroConfig>) => {
-    setHeroConfig(prev => ({ ...prev, ...data }));
+    const nextConfig = { ...heroConfig, ...data };
+    setHeroConfig(nextConfig);
+    syncToFirestore({ heroConfig: nextConfig });
     addAuditLog('UPDATE_HERO', 'Hero Section', 'Hero config updated');
   };
 
   const addSkillCategory = (cat: Omit<SkillCategory, 'id'>) => {
-    setSkillCategories(prev => [...prev, { ...cat, id: `cat-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` }]);
+    const newCats = [...skillCategories, { ...cat, id: `cat-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` }];
+    setSkillCategories(newCats);
+    syncToFirestore({ skillCategories: newCats });
     addAuditLog('CREATE_SKILL_CATEGORY', 'Skills', `Added category: ${cat.name.id}`);
   };
 
   const updateSkillCategory = (id: string, cat: Partial<SkillCategory>) => {
-    setSkillCategories(prev => prev.map(c => (c.id === id ? { ...c, ...cat } : c)));
+    const nextCats = skillCategories.map(c => (c.id === id ? { ...c, ...cat } : c));
+    setSkillCategories(nextCats);
+    syncToFirestore({ skillCategories: nextCats });
     addAuditLog('UPDATE_SKILL_CATEGORY', 'Skills', `Updated category ID: ${id}`);
   };
 
   const deleteSkillCategory = (id: string) => {
-    setSkillCategories(prev => prev.filter(c => c.id !== id));
-    // Skills keep their categoryId; the UI shows them as uncategorised rather
-    // than deleting a skill the admin didn't ask to remove.
+    const nextCats = skillCategories.filter(c => c.id !== id);
+    setSkillCategories(nextCats);
+    syncToFirestore({ skillCategories: nextCats });
     addAuditLog('DELETE_SKILL_CATEGORY', 'Skills', `Deleted category ID: ${id}`);
   };
 
   const addSkill = (skill: Omit<Skill, 'id'>) => {
     const newSkill: Skill = { ...skill, id: `sk-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setSkills(prev => [...prev, newSkill]);
+    const nextSkills = [...skills, newSkill];
+    setSkills(nextSkills);
+    syncToFirestore({ skills: nextSkills });
     addAuditLog('CREATE_SKILL', 'Skills', `Added skill: ${skill.name}`);
   };
 
   const updateSkill = (id: string, skill: Partial<Skill>) => {
-    setSkills(prev => prev.map(s => s.id === id ? { ...s, ...skill } : s));
+    const nextSkills = skills.map(s => s.id === id ? { ...s, ...skill } : s);
+    setSkills(nextSkills);
+    syncToFirestore({ skills: nextSkills });
     addAuditLog('UPDATE_SKILL', 'Skills', `Updated skill ID: ${id}`);
   };
 
   const deleteSkill = (id: string) => {
-    setSkills(prev => prev.filter(s => s.id !== id));
+    const nextSkills = skills.filter(s => s.id !== id);
+    setSkills(nextSkills);
+    syncToFirestore({ skills: nextSkills });
     addAuditLog('DELETE_SKILL', 'Skills', `Deleted skill ID: ${id}`);
   };
 
   const addExperience = (exp: Omit<Experience, 'id'>) => {
     const newExp: Experience = { ...exp, id: `exp-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setExperiences(prev => [newExp, ...prev]);
+    const nextExps = [newExp, ...experiences];
+    setExperiences(nextExps);
+    syncToFirestore({ experiences: nextExps });
     addAuditLog('CREATE_EXP', 'Experience', `Added experience at ${exp.companyName}`);
   };
 
   const updateExperience = (id: string, exp: Partial<Experience>) => {
-    setExperiences(prev => prev.map(e => e.id === id ? { ...e, ...exp } : e));
+    const nextExps = experiences.map(e => e.id === id ? { ...e, ...exp } : e);
+    setExperiences(nextExps);
+    syncToFirestore({ experiences: nextExps });
     addAuditLog('UPDATE_EXP', 'Experience', `Updated experience ID: ${id}`);
   };
 
   const deleteExperience = (id: string) => {
-    setExperiences(prev => prev.filter(e => e.id !== id));
+    const nextExps = experiences.filter(e => e.id !== id);
+    setExperiences(nextExps);
+    syncToFirestore({ experiences: nextExps });
     addAuditLog('DELETE_EXP', 'Experience', `Deleted experience ID: ${id}`);
   };
 
   const addEducation = (edu: Omit<Education, 'id'>) => {
     const newEdu: Education = { ...edu, id: `edu-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setEducations(prev => [newEdu, ...prev]);
+    const nextEdus = [newEdu, ...educations];
+    setEducations(nextEdus);
+    syncToFirestore({ educations: nextEdus });
     addAuditLog('CREATE_EDU', 'Education', `Added education: ${edu.institutionName}`);
   };
 
   const updateEducation = (id: string, edu: Partial<Education>) => {
-    setEducations(prev => prev.map(e => e.id === id ? { ...e, ...edu } : e));
+    const nextEdus = educations.map(e => e.id === id ? { ...e, ...edu } : e);
+    setEducations(nextEdus);
+    syncToFirestore({ educations: nextEdus });
     addAuditLog('UPDATE_EDU', 'Education', `Updated education ID: ${id}`);
   };
 
   const deleteEducation = (id: string) => {
-    setEducations(prev => prev.filter(e => e.id !== id));
+    const nextEdus = educations.filter(e => e.id !== id);
+    setEducations(nextEdus);
+    syncToFirestore({ educations: nextEdus });
     addAuditLog('DELETE_EDU', 'Education', `Deleted education ID: ${id}`);
   };
 
   const addProject = (proj: Omit<Project, 'id' | 'views'>) => {
     const newProj: Project = { ...proj, id: `proj-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, views: 0 };
-    setProjects(prev => [newProj, ...prev]);
+    const nextProjs = [newProj, ...projects];
+    setProjects(nextProjs);
+    syncToFirestore({ projects: nextProjs });
     addAuditLog('CREATE_PROJECT', 'Projects', `Created project: ${proj.title}`);
   };
 
   const updateProject = (id: string, proj: Partial<Project>) => {
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, ...proj } : p));
+    const nextProjs = projects.map(p => p.id === id ? { ...p, ...proj } : p);
+    setProjects(nextProjs);
+    syncToFirestore({ projects: nextProjs });
     addAuditLog('UPDATE_PROJECT', 'Projects', `Updated project ID: ${id}`);
   };
 
   const deleteProject = (id: string) => {
-    setProjects(prev => prev.filter(p => p.id !== id));
+    const nextProjs = projects.filter(p => p.id !== id);
+    setProjects(nextProjs);
+    syncToFirestore({ projects: nextProjs });
     addAuditLog('DELETE_PROJECT', 'Projects', `Deleted project ID: ${id}`);
   };
 
   const incrementProjectView = (id: string) => {
-    setProjects(prev => prev.map(p => p.id === id ? { ...p, views: p.views + 1 } : p));
+    const nextProjs = projects.map(p => p.id === id ? { ...p, views: p.views + 1 } : p);
+    setProjects(nextProjs);
+    syncToFirestore({ projects: nextProjs });
   };
 
   const addCertificate = (cert: Omit<Certificate, 'id'>) => {
     const newCert: Certificate = { ...cert, id: `cert-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setCertificates(prev => [newCert, ...prev]);
+    const nextCerts = [newCert, ...certificates];
+    setCertificates(nextCerts);
+    syncToFirestore({ certificates: nextCerts });
     addAuditLog('CREATE_CERT', 'Certificates', `Added certificate: ${cert.title}`);
   };
 
   const updateCertificate = (id: string, cert: Partial<Certificate>) => {
-    setCertificates(prev => prev.map(c => c.id === id ? { ...c, ...cert } : c));
+    const nextCerts = certificates.map(c => c.id === id ? { ...c, ...cert } : c);
+    setCertificates(nextCerts);
+    syncToFirestore({ certificates: nextCerts });
     addAuditLog('UPDATE_CERT', 'Certificates', `Updated certificate ID: ${id}`);
   };
 
   const deleteCertificate = (id: string) => {
-    setCertificates(prev => prev.filter(c => c.id !== id));
+    const nextCerts = certificates.filter(c => c.id !== id);
+    setCertificates(nextCerts);
+    syncToFirestore({ certificates: nextCerts });
     addAuditLog('DELETE_CERT', 'Certificates', `Deleted certificate ID: ${id}`);
   };
 
   const addAchievement = (ach: Omit<Achievement, 'id'>) => {
     const newAch: Achievement = { ...ach, id: `ach-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setAchievements(prev => [newAch, ...prev]);
+    const nextAchs = [newAch, ...achievements];
+    setAchievements(nextAchs);
+    syncToFirestore({ achievements: nextAchs });
     addAuditLog('CREATE_ACHIEVEMENT', 'Achievements', 'Added new achievement');
   };
 
   const updateAchievement = (id: string, ach: Partial<Achievement>) => {
-    setAchievements(prev => prev.map(a => a.id === id ? { ...a, ...ach } : a));
+    const nextAchs = achievements.map(a => a.id === id ? { ...a, ...ach } : a);
+    setAchievements(nextAchs);
+    syncToFirestore({ achievements: nextAchs });
     addAuditLog('UPDATE_ACHIEVEMENT', 'Achievements', `Updated achievement ID: ${id}`);
   };
 
   const deleteAchievement = (id: string) => {
-    setAchievements(prev => prev.filter(a => a.id !== id));
+    const nextAchs = achievements.filter(a => a.id !== id);
+    setAchievements(nextAchs);
+    syncToFirestore({ achievements: nextAchs });
     addAuditLog('DELETE_ACHIEVEMENT', 'Achievements', `Deleted achievement ID: ${id}`);
   };
 
   const addOrganization = (org: Omit<Organization, 'id'>) => {
     const newOrg: Organization = { ...org, id: `org-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setOrganizations(prev => [newOrg, ...prev]);
+    const nextOrgs = [newOrg, ...organizations];
+    setOrganizations(nextOrgs);
+    syncToFirestore({ organizations: nextOrgs });
     addAuditLog('CREATE_ORG', 'Organizations', `Added organization: ${org.organizationName}`);
   };
 
   const updateOrganization = (id: string, org: Partial<Organization>) => {
-    setOrganizations(prev => prev.map(o => o.id === id ? { ...o, ...org } : o));
+    const nextOrgs = organizations.map(o => o.id === id ? { ...o, ...org } : o);
+    setOrganizations(nextOrgs);
+    syncToFirestore({ organizations: nextOrgs });
     addAuditLog('UPDATE_ORG', 'Organizations', `Updated organization ID: ${id}`);
   };
 
   const deleteOrganization = (id: string) => {
-    setOrganizations(prev => prev.filter(o => o.id !== id));
+    const nextOrgs = organizations.filter(o => o.id !== id);
+    setOrganizations(nextOrgs);
+    syncToFirestore({ organizations: nextOrgs });
     addAuditLog('DELETE_ORG', 'Organizations', `Deleted organization ID: ${id}`);
   };
 
   const addTraining = (trn: Omit<Training, 'id'>) => {
     const newTrn: Training = { ...trn, id: `trn-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setTrainings(prev => [newTrn, ...prev]);
+    const nextTrns = [newTrn, ...trainings];
+    setTrainings(nextTrns);
+    syncToFirestore({ trainings: nextTrns });
     addAuditLog('CREATE_TRAINING', 'Trainings', `Added training: ${trn.trainingName}`);
   };
 
   const updateTraining = (id: string, trn: Partial<Training>) => {
-    setTrainings(prev => prev.map(t => t.id === id ? { ...t, ...trn } : t));
+    const nextTrns = trainings.map(t => t.id === id ? { ...t, ...trn } : t);
+    setTrainings(nextTrns);
+    syncToFirestore({ trainings: nextTrns });
     addAuditLog('UPDATE_TRAINING', 'Trainings', `Updated training ID: ${id}`);
   };
 
   const deleteTraining = (id: string) => {
-    setTrainings(prev => prev.filter(t => t.id !== id));
+    const nextTrns = trainings.filter(t => t.id !== id);
+    setTrainings(nextTrns);
+    syncToFirestore({ trainings: nextTrns });
     addAuditLog('DELETE_TRAINING', 'Trainings', `Deleted training ID: ${id}`);
   };
 
   const addPublication = (pub: Omit<Publication, 'id'>) => {
     const newPub: Publication = { ...pub, id: `pub-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setPublications(prev => [newPub, ...prev]);
+    const nextPubs = [newPub, ...publications];
+    setPublications(nextPubs);
+    syncToFirestore({ publications: nextPubs });
     addAuditLog('CREATE_PUB', 'Publications', `Added publication: ${pub.title}`);
   };
 
   const updatePublication = (id: string, pub: Partial<Publication>) => {
-    setPublications(prev => prev.map(p => p.id === id ? { ...p, ...pub } : p));
+    const nextPubs = publications.map(p => p.id === id ? { ...p, ...pub } : p);
+    setPublications(nextPubs);
+    syncToFirestore({ publications: nextPubs });
     addAuditLog('UPDATE_PUB', 'Publications', `Updated publication ID: ${id}`);
   };
 
   const deletePublication = (id: string) => {
-    setPublications(prev => prev.filter(p => p.id !== id));
+    const nextPubs = publications.filter(p => p.id !== id);
+    setPublications(nextPubs);
+    syncToFirestore({ publications: nextPubs });
     addAuditLog('DELETE_PUB', 'Publications', `Deleted publication ID: ${id}`);
   };
 
   const addTestimonial = (test: Omit<Testimonial, 'id' | 'isApproved'>) => {
     const newTest: Testimonial = { ...test, id: `test-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, isApproved: false };
-    setTestimonials(prev => [newTest, ...prev]);
+    const nextTests = [newTest, ...testimonials];
+    setTestimonials(nextTests);
+    syncToFirestore({ testimonials: nextTests });
   };
 
   const updateTestimonial = (id: string, test: Partial<Testimonial>) => {
-    setTestimonials(prev => prev.map(t => t.id === id ? { ...t, ...test } : t));
+    const nextTests = testimonials.map(t => t.id === id ? { ...t, ...test } : t);
+    setTestimonials(nextTests);
+    syncToFirestore({ testimonials: nextTests });
     addAuditLog('UPDATE_TESTIMONIAL', 'Testimonials', `Updated testimonial ID: ${id}`);
   };
 
   const deleteTestimonial = (id: string) => {
-    setTestimonials(prev => prev.filter(t => t.id !== id));
+    const nextTests = testimonials.filter(t => t.id !== id);
+    setTestimonials(nextTests);
+    syncToFirestore({ testimonials: nextTests });
     addAuditLog('DELETE_TESTIMONIAL', 'Testimonials', `Deleted testimonial ID: ${id}`);
   };
 
   const approveTestimonial = (id: string) => {
-    setTestimonials(prev => prev.map(t => t.id === id ? { ...t, isApproved: true } : t));
+    const nextTests = testimonials.map(t => t.id === id ? { ...t, isApproved: true } : t);
+    setTestimonials(nextTests);
+    syncToFirestore({ testimonials: nextTests });
     addAuditLog('APPROVE_TESTIMONIAL', 'Testimonials', `Approved testimonial ID: ${id}`);
   };
 
   const addService = (srv: Omit<Service, 'id'>) => {
     const newSrv: Service = { ...srv, id: `srv-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setServices(prev => [...prev, newSrv]);
+    const nextSrvs = [...services, newSrv];
+    setServices(nextSrvs);
+    syncToFirestore({ services: nextSrvs });
     addAuditLog('CREATE_SERVICE', 'Services', 'Added service');
   };
 
   const updateService = (id: string, srv: Partial<Service>) => {
-    setServices(prev => prev.map(s => s.id === id ? { ...s, ...srv } : s));
+    const nextSrvs = services.map(s => s.id === id ? { ...s, ...srv } : s);
+    setServices(nextSrvs);
+    syncToFirestore({ services: nextSrvs });
     addAuditLog('UPDATE_SERVICE', 'Services', `Updated service ID: ${id}`);
   };
 
   const deleteService = (id: string) => {
-    setServices(prev => prev.filter(s => s.id !== id));
+    const nextSrvs = services.filter(s => s.id !== id);
+    setServices(nextSrvs);
+    syncToFirestore({ services: nextSrvs });
     addAuditLog('DELETE_SERVICE', 'Services', `Deleted service ID: ${id}`);
   };
 
   const addBlogPost = (post: Omit<BlogPost, 'id' | 'views' | 'likes' | 'commentsCount'>) => {
     const newPost: BlogPost = { ...post, id: `post-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, views: 0, likes: 0, commentsCount: 0 };
-    setBlogPosts(prev => [newPost, ...prev]);
+    const nextPosts = [newPost, ...blogPosts];
+    setBlogPosts(nextPosts);
+    syncToFirestore({ blogPosts: nextPosts });
     addAuditLog('CREATE_BLOG', 'Blog', 'Created blog post');
   };
 
   const updateBlogPost = (id: string, post: Partial<BlogPost>) => {
-    setBlogPosts(prev => prev.map(p => p.id === id ? { ...p, ...post } : p));
+    const nextPosts = blogPosts.map(p => p.id === id ? { ...p, ...post } : p);
+    setBlogPosts(nextPosts);
+    syncToFirestore({ blogPosts: nextPosts });
     addAuditLog('UPDATE_BLOG', 'Blog', `Updated blog post ID: ${id}`);
   };
 
   const deleteBlogPost = (id: string) => {
-    setBlogPosts(prev => prev.filter(p => p.id !== id));
+    const nextPosts = blogPosts.filter(p => p.id !== id);
+    setBlogPosts(nextPosts);
+    syncToFirestore({ blogPosts: nextPosts });
     addAuditLog('DELETE_BLOG', 'Blog', `Deleted blog post ID: ${id}`);
   };
 
   const incrementBlogLike = (id: string) => {
-    setBlogPosts(prev => prev.map(p => p.id === id ? { ...p, likes: p.likes + 1 } : p));
+    const nextPosts = blogPosts.map(p => p.id === id ? { ...p, likes: p.likes + 1 } : p);
+    setBlogPosts(nextPosts);
+    syncToFirestore({ blogPosts: nextPosts });
   };
 
   const incrementBlogView = (id: string) => {
-    setBlogPosts(prev => prev.map(p => p.id === id ? { ...p, views: p.views + 1 } : p));
+    const nextPosts = blogPosts.map(p => p.id === id ? { ...p, views: p.views + 1 } : p);
+    setBlogPosts(nextPosts);
+    syncToFirestore({ blogPosts: nextPosts });
   };
 
   const addGalleryItem = (item: Omit<GalleryItem, 'id'>) => {
     const newItem: GalleryItem = { ...item, id: `gal-${Date.now()}-${Math.random().toString(36).slice(2, 7)}` };
-    setGallery(prev => [newItem, ...prev]);
+    const nextGallery = [newItem, ...gallery];
+    setGallery(nextGallery);
+    syncToFirestore({ gallery: nextGallery });
     addAuditLog('CREATE_GALLERY', 'Gallery', 'Added gallery item');
   };
 
   const updateGalleryItem = (id: string, item: Partial<GalleryItem>) => {
-    setGallery(prev => prev.map(g => (g.id === id ? { ...g, ...item } : g)));
+    const nextGallery = gallery.map(g => (g.id === id ? { ...g, ...item } : g));
+    setGallery(nextGallery);
+    syncToFirestore({ gallery: nextGallery });
     addAuditLog('UPDATE_GALLERY', 'Gallery', `Updated gallery item ID: ${id}`);
   };
 
   const deleteGalleryItem = (id: string) => {
-    setGallery(prev => prev.filter(g => g.id !== id));
+    const nextGallery = gallery.filter(g => g.id !== id);
+    setGallery(nextGallery);
+    syncToFirestore({ gallery: nextGallery });
     addAuditLog('DELETE_GALLERY', 'Gallery', `Deleted gallery item ID: ${id}`);
   };
 
   const addCVVersion = (cv: Omit<CVVersion, 'id' | 'downloadCount'>) => {
     const newCV: CVVersion = { ...cv, id: `cv-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, downloadCount: 0 };
-    setCvVersions(prev => [newCV, ...prev]);
+    const nextCVs = [newCV, ...cvVersions];
+    setCvVersions(nextCVs);
+    syncToFirestore({ cvVersions: nextCVs });
     addAuditLog('CREATE_CV', 'CV', `Uploaded new CV version: ${cv.versionName}`);
   };
 
   const updateCVVersion = (id: string, cv: Partial<CVVersion>) => {
-    setCvVersions(prev => prev.map(c => (c.id === id ? { ...c, ...cv } : c)));
+    const nextCVs = cvVersions.map(c => (c.id === id ? { ...c, ...cv } : c));
+    setCvVersions(nextCVs);
+    syncToFirestore({ cvVersions: nextCVs });
     addAuditLog('UPDATE_CV', 'CV', `Updated CV version ID: ${id}`);
   };
 
   const deleteCVVersion = (id: string) => {
-    setCvVersions(prev => prev.filter(c => c.id !== id));
+    const nextCVs = cvVersions.filter(c => c.id !== id);
+    setCvVersions(nextCVs);
+    syncToFirestore({ cvVersions: nextCVs });
     addAuditLog('DELETE_CV', 'CV', `Deleted CV version ID: ${id}`);
   };
 
   const setActiveCV = (id: string) => {
-    setCvVersions(prev => prev.map(c => ({ ...c, isActive: c.id === id })));
+    const nextCVs = cvVersions.map(c => ({ ...c, isActive: c.id === id }));
+    setCvVersions(nextCVs);
+    syncToFirestore({ cvVersions: nextCVs });
     addAuditLog('SET_ACTIVE_CV', 'CV', `Set active CV ID: ${id}`);
   };
 
   const incrementCVDownload = (id: string) => {
-    setCvVersions(prev => prev.map(c => c.id === id ? { ...c, downloadCount: c.downloadCount + 1 } : c));
-    setAnalytics(prev => ({ ...prev, cvDownloads: prev.cvDownloads + 1 }));
+    const nextCVs = cvVersions.map(c => c.id === id ? { ...c, downloadCount: c.downloadCount + 1 } : c);
+    setCvVersions(nextCVs);
+    const nextAnalytics = { ...analytics, cvDownloads: analytics.cvDownloads + 1 };
+    setAnalytics(nextAnalytics);
+    syncToFirestore({ cvVersions: nextCVs, analytics: nextAnalytics });
   };
 
   const addMessage = (msg: Omit<ContactMessage, 'id' | 'receivedAt' | 'status'>) => {
@@ -787,81 +870,122 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       receivedAt: new Date().toISOString(),
       status: 'Unread'
     };
-    setMessages(prev => [newMsg, ...prev]);
+    const nextMsgs = [newMsg, ...messages];
+    setMessages(nextMsgs);
+    syncToFirestore({ messages: nextMsgs });
   };
 
   const updateMessageStatus = (id: string, status: ContactMessage['status']) => {
-    setMessages(prev => prev.map(m => m.id === id ? { ...m, status } : m));
+    const nextMsgs = messages.map(m => m.id === id ? { ...m, status } : m);
+    setMessages(nextMsgs);
+    syncToFirestore({ messages: nextMsgs });
   };
 
   const deleteMessage = (id: string) => {
-    setMessages(prev => prev.filter(m => m.id !== id));
+    const nextMsgs = messages.filter(m => m.id !== id);
+    setMessages(nextMsgs);
+    syncToFirestore({ messages: nextMsgs });
   };
 
   const addSubscriber = (email: string): boolean => {
-    let added = false;
-    setSubscribers(prev => {
-      if (prev.some(s => s.email.toLowerCase() === email.toLowerCase())) {
-        return prev;
-      }
-      added = true;
-      const newSub: Subscriber = {
-        id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        email,
-        subscribedAt: new Date().toISOString(),
-        isActive: true
-      };
-      return [newSub, ...prev];
-    });
-    return added;
+    if (subscribers.some(s => s.email.toLowerCase() === email.toLowerCase())) {
+      return false;
+    }
+    const newSub: Subscriber = {
+      id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      email,
+      subscribedAt: new Date().toISOString(),
+      isActive: true
+    };
+    const nextSubs = [newSub, ...subscribers];
+    setSubscribers(nextSubs);
+    syncToFirestore({ subscribers: nextSubs });
+    return true;
   };
 
   const updateSubscriber = (id: string, sub: Partial<Subscriber>) => {
-    setSubscribers(prev => prev.map(s => (s.id === id ? { ...s, ...sub } : s)));
+    const nextSubs = subscribers.map(s => (s.id === id ? { ...s, ...sub } : s));
+    setSubscribers(nextSubs);
+    syncToFirestore({ subscribers: nextSubs });
     addAuditLog('UPDATE_SUBSCRIBER', 'Subscribers', `Updated subscriber ID: ${id}`);
   };
 
   const deleteSubscriber = (id: string) => {
-    setSubscribers(prev => prev.filter(s => s.id !== id));
+    const nextSubs = subscribers.filter(s => s.id !== id);
+    setSubscribers(nextSubs);
+    syncToFirestore({ subscribers: nextSubs });
     addAuditLog('DELETE_SUBSCRIBER', 'Subscribers', `Deleted subscriber ID: ${id}`);
   };
 
   const clearAuditLogs = () => {
     setAuditLogs([]);
+    syncToFirestore({ auditLogs: [] });
   };
 
   const updateThemeSettings = (settings: Partial<ThemeSettings>) => {
-    setThemeSettings(prev => {
-      const next = { ...prev, ...settings };
-      if (settings.mode !== undefined) {
-        if (settings.mode === 'system') {
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          setIsDarkMode(prefersDark);
-        } else {
-          setIsDarkMode(settings.mode === 'dark');
-        }
+    const nextSettings = { ...themeSettings, ...settings };
+    if (settings.mode !== undefined) {
+      if (settings.mode === 'system') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setIsDarkMode(prefersDark);
+      } else {
+        setIsDarkMode(settings.mode === 'dark');
       }
-      return next;
-    });
+    }
+    setThemeSettings(nextSettings);
+    syncToFirestore({ themeSettings: nextSettings });
     addAuditLog('UPDATE_THEME', 'Settings', 'Theme settings updated');
   };
 
   const updateSEOSettings = (seo: Partial<SEOSettings>) => {
-    setSeoSettings(prev => ({ ...prev, ...seo }));
+    const nextSEO = { ...seoSettings, ...seo };
+    setSeoSettings(nextSEO);
+    syncToFirestore({ seoSettings: nextSEO });
     addAuditLog('UPDATE_SEO', 'Settings', 'SEO settings updated');
   };
 
   const updateSystemSettings = (sys: Partial<SystemSettings>) => {
-    setSystemSettings(prev => ({ ...prev, ...sys }));
+    const nextSys = { ...systemSettings, ...sys };
+    setSystemSettings(nextSys);
+    syncToFirestore({ systemSettings: nextSys });
     addAuditLog('UPDATE_SYSTEM', 'Settings', 'System settings updated');
   };
 
   const updatePageSections = (sections: PageSectionConfig[]) => {
     setPageSections(sections);
+    syncToFirestore({ pageSections: sections });
     addAuditLog('REORDER_SECTIONS', 'Page Builder', 'Updated page sections ordering & visibility');
   };
 
   const resetToDefaultData = () => {
+    const initialData = {
+        profile: initialProfile,
+        heroConfig: initialHeroConfig,
+        skillCategories: initialSkillCategories,
+        skills: initialSkills,
+        experiences: initialExperiences,
+        educations: initialEducations,
+        projects: initialProjects,
+        certificates: initialCertificates,
+        achievements: initialAchievements,
+        organizations: initialOrganizations,
+        trainings: initialTrainings,
+        publications: initialPublications,
+        testimonials: initialTestimonials,
+        services: initialServices,
+        blogPosts: initialBlogPosts,
+        gallery: initialGallery,
+        cvVersions: initialCVVersions,
+        messages: initialMessages,
+        subscribers: initialSubscribers,
+        themeSettings: initialThemeSettings,
+        seoSettings: initialSEOSettings,
+        systemSettings: initialSystemSettings,
+        pageSections: initialPageSections,
+        auditLogs: initialAuditLogs,
+        analytics: initialAnalytics
+    };
+    
     setProfile(initialProfile);
     setHeroConfig(initialHeroConfig);
     setSkillCategories(initialSkillCategories);
@@ -887,7 +1011,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setSubscribers(initialSubscribers);
     setAuditLogs(initialAuditLogs);
     setAnalytics(initialAnalytics);
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
+    
+    syncToFirestore(initialData);
     addAuditLog('RESET_DATABASE', 'System', 'Database reset to initial default seed values');
   };
 
@@ -932,6 +1057,8 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (parsed.pageSections) setPageSections(parsed.pageSections);
       if (parsed.auditLogs) setAuditLogs(parsed.auditLogs);
       if (parsed.analytics) setAnalytics(parsed.analytics);
+      
+      syncToFirestore(parsed);
       addAuditLog('IMPORT_DATABASE', 'System', 'Successfully imported database JSON file');
       return true;
     } catch (e) {

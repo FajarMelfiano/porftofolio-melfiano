@@ -5,7 +5,7 @@ import { useDataContext } from '@/lib/data-context';
 import { SEOSettings } from '@/lib/types';
 import { Search, Save, AlertTriangle } from 'lucide-react';
 import {
-  PanelHeader, Card, Field, TextInput, TextArea, Grid, FormSection, SavedBanner
+  PanelHeader, Card, Field, TextInput, TextArea, Grid, FormSection, SavedBanner, ImageUploader
 } from './ui';
 
 /** Google truncates around these lengths, so warn rather than hard-limit. */
@@ -107,7 +107,12 @@ export const AdminSEOSettings: React.FC = () => {
                 label="URL Gambar OG"
                 hint="Ukuran ideal 1200×630 piksel. Dipakai saat tautan dibagikan."
               >
-                <TextInput value={form.ogImage} onChange={v => set('ogImage', v)} />
+                <ImageUploader
+                  label="Open Graph Image (1200x630)"
+                  value={form.ogImage}
+                  onChange={v => set('ogImage', v)}
+                  folder="seo"
+                />
               </Field>
               {form.ogImage && (
                 // eslint-disable-next-line @next/next/no-img-element

@@ -27,12 +27,15 @@ import { AdminPageBuilder } from './AdminPageBuilder';
 import { AdminSEOSettings } from './AdminSEOSettings';
 import { AdminSystemSettings } from './AdminSystemSettings';
 import { AdminAuditLogViewer } from './AdminAuditLogViewer';
+import { AdminFileManager } from './AdminFileManager';
+import { AdminUserManager } from './AdminUserManager';
 
 import {
   LayoutDashboard, User, Sparkles, Code2, Briefcase, GraduationCap, Folder,
   Award, Trophy, Users, BookMarked, BookOpen, Wrench, MessageSquare,
   Image as ImageIcon, FileText, Mail, UserPlus, Palette, Layers, Search,
-  Settings, ScrollText, LogOut, ExternalLink, Shield, Menu, X, Loader2
+  Settings, ScrollText, LogOut, ExternalLink, Shield, Menu, X, Loader2,
+  FolderOpen, UserCog
 } from 'lucide-react';
 
 type MenuItem = { id: string; label: string; icon: React.ReactNode; badge?: number };
@@ -120,6 +123,8 @@ export const AdminLayout: React.FC = () => {
         { id: 'builder', label: 'Page Builder', icon: <Layers className="w-4 h-4" /> },
         { id: 'theme', label: 'Tampilan & Tema', icon: <Palette className="w-4 h-4" /> },
         { id: 'seo', label: 'SEO', icon: <Search className="w-4 h-4" /> },
+        { id: 'files', label: 'File Manager', icon: <FolderOpen className="w-4 h-4" /> },
+        { id: 'users', label: 'Manajemen Akun', icon: <UserCog className="w-4 h-4" /> },
         { id: 'system', label: 'Sistem & Cadangan', icon: <Settings className="w-4 h-4" /> },
         { id: 'audit', label: 'Log Aktivitas', icon: <ScrollText className="w-4 h-4" /> }
       ]
@@ -149,6 +154,8 @@ export const AdminLayout: React.FC = () => {
       case 'builder': return <AdminPageBuilder />;
       case 'theme': return <AdminThemeCustomizer />;
       case 'seo': return <AdminSEOSettings />;
+      case 'files': return <AdminFileManager />;
+      case 'users': return <AdminUserManager />;
       case 'system': return <AdminSystemSettings />;
       case 'audit': return <AdminAuditLogViewer />;
       default: return <AdminDashboard onNavigate={setActiveTab} />;

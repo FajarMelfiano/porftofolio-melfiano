@@ -7,7 +7,7 @@ import { MessageSquare, Check, Star } from 'lucide-react';
 import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
-  BilingualArea, useArmedDelete, DeleteConfirmBar
+  BilingualArea, useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const emptyTestimonial = (order: number): Omit<Testimonial, 'id' | 'isApproved'> => ({
@@ -135,7 +135,12 @@ export const AdminTestimonialsManager: React.FC = () => {
                   <TextInput value={form.companyName} onChange={v => set('companyName', v)} />
                 </Field>
                 <Field label="URL Foto Profil">
-                  <TextInput value={form.avatarUrl} onChange={v => set('avatarUrl', v)} />
+                  <ImageUploader
+                    label="Avatar Klien"
+                    value={form.avatarUrl}
+                    onChange={v => set('avatarUrl', v)}
+                    folder="testimonials"
+                  />
                 </Field>
               </Grid>
               <Field label="URL Profil (LinkedIn, dll.)">

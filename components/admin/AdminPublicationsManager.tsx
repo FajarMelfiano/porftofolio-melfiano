@@ -7,7 +7,7 @@ import { BookOpen } from 'lucide-react';
 import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput, Select,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
-  BilingualArea, TagsInput, useArmedDelete, DeleteConfirmBar
+  BilingualArea, TagsInput, useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const TYPES = [
@@ -170,15 +170,19 @@ export const AdminPublicationsManager: React.FC = () => {
                 <Field label="URL Publikasi">
                   <TextInput value={form.url ?? ''} onChange={v => set('url', v)} />
                 </Field>
-                <Field label="URL PDF">
-                  <TextInput value={form.pdfUrl ?? ''} onChange={v => set('pdfUrl', v)} />
-                </Field>
-                <Field label="URL Thumbnail">
-                  <TextInput
-                    value={form.thumbnailUrl ?? ''}
-                    onChange={v => set('thumbnailUrl', v)}
-                  />
-                </Field>
+                <ImageUploader
+                  label="File PDF Publikasi (Opsional)"
+                  value={form.pdfUrl}
+                  onChange={v => setForm({ ...form, pdfUrl: v })}
+                  folder="publications"
+                  accept="application/pdf"
+                />
+                <ImageUploader
+                  label="Thumbnail Jurnal (Opsional)"
+                  value={form.thumbnailUrl}
+                  onChange={v => setForm({ ...form, thumbnailUrl: v })}
+                  folder="publications"
+                />
               </Grid>
               <Field label="Urutan Tampil">
                 <NumberInput min={1} value={form.order} onChange={v => set('order', v)} />

@@ -7,7 +7,7 @@ import { Image as ImageIcon } from 'lucide-react';
 import {
   PanelHeader, Card, AddButton, Field, TextInput, Select,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
-  BilingualText, BilingualArea, useArmedDelete, DeleteConfirmBar
+  BilingualText, BilingualArea, useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const CATEGORIES = [
@@ -89,11 +89,12 @@ export const AdminGalleryManager: React.FC = () => {
 
             <FormSection title="Media">
               <Field label="URL Media" required>
-                <TextInput
-                  required
+                <ImageUploader
+                  label="File Media"
                   value={form.mediaUrl}
                   onChange={v => set('mediaUrl', v)}
-                  placeholder="https://..."
+                  folder="gallery"
+                  accept={form.mediaType === 'video' ? 'video/*' : 'image/*'}
                 />
               </Field>
               {form.mediaUrl && form.mediaType === 'image' && (

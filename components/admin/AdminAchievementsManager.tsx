@@ -7,7 +7,7 @@ import { Trophy } from 'lucide-react';
 import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput, Select, Toggle,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
-  BilingualText, BilingualArea, useArmedDelete, DeleteConfirmBar
+  BilingualText, BilingualArea, useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const LEVELS = [
@@ -138,15 +138,19 @@ export const AdminAchievementsManager: React.FC = () => {
 
             <FormSection title="Bukti & Tautan">
               <Grid cols={3}>
-                <Field label="URL Sertifikat">
-                  <TextInput
-                    value={form.certificateUrl ?? ''}
-                    onChange={v => set('certificateUrl', v)}
-                  />
-                </Field>
-                <Field label="URL Gambar">
-                  <TextInput value={form.imageUrl ?? ''} onChange={v => set('imageUrl', v)} />
-                </Field>
+                <ImageUploader
+                  label="File Sertifikat (Opsional)"
+                  value={form.certificateUrl}
+                  onChange={v => setForm({ ...form, certificateUrl: v })}
+                  folder="achievements"
+                  accept="*/*"
+                />
+                <ImageUploader
+                  label="Gambar Acara (Opsional)"
+                  value={form.imageUrl}
+                  onChange={v => setForm({ ...form, imageUrl: v })}
+                  folder="achievements"
+                />
                 <Field label="URL Validasi">
                   <TextInput
                     value={form.validationUrl ?? ''}

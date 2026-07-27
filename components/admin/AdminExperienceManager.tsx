@@ -8,7 +8,7 @@ import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput, Select, Toggle,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
   BilingualText, BilingualArea, BilingualListEditor, TagsInput,
-  useArmedDelete, DeleteConfirmBar
+  useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const EMPLOYMENT_TYPES = [
@@ -120,7 +120,12 @@ export const AdminExperienceManager: React.FC = () => {
               </Grid>
               <Grid>
                 <Field label="URL Logo Perusahaan">
-                  <TextInput value={form.companyLogo ?? ''} onChange={v => set('companyLogo', v)} />
+                  <ImageUploader
+                    label="Logo Perusahaan (Opsional)"
+                    value={form.companyLogo ?? ''}
+                    onChange={v => set('companyLogo', v)}
+                    folder="experience"
+                  />
                 </Field>
                 <Field label="Situs Perusahaan">
                   <TextInput

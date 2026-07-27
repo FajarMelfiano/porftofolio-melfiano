@@ -7,7 +7,7 @@ import { BookMarked } from 'lucide-react';
 import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput, Toggle,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
-  TagsInput, useArmedDelete, DeleteConfirmBar
+  TagsInput, useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const emptyTraining = (order: number): Omit<Training, 'id'> => ({
@@ -124,12 +124,13 @@ export const AdminTrainingsManager: React.FC = () => {
                 />
               </Field>
               <Grid>
-                <Field label="URL Sertifikat">
-                  <TextInput
-                    value={form.certificateUrl ?? ''}
-                    onChange={v => set('certificateUrl', v)}
-                  />
-                </Field>
+                <ImageUploader
+                  label="File Sertifikat (Opsional)"
+                  value={form.certificateUrl}
+                  onChange={v => setForm({ ...form, certificateUrl: v })}
+                  folder="trainings"
+                  accept="*/*"
+                />
                 <Field label="URL Halaman Pelatihan">
                   <TextInput value={form.trainingUrl ?? ''} onChange={v => set('trainingUrl', v)} />
                 </Field>

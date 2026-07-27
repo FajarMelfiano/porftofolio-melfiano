@@ -7,7 +7,7 @@ import { FileText, Star, AlertTriangle } from 'lucide-react';
 import {
   PanelHeader, Card, AddButton, Field, TextInput, Select,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
-  useArmedDelete, DeleteConfirmBar
+  useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const CV_TYPES = [
@@ -115,11 +115,12 @@ export const AdminCVManager: React.FC = () => {
                 required
                 hint="Taruh PDF di folder public/ lalu isi dengan /nama-berkas.pdf, atau tempel URL penuh."
               >
-                <TextInput
-                  required
+                <ImageUploader
+                  label="Unggah File CV"
                   value={form.fileUrl}
                   onChange={v => set('fileUrl', v)}
-                  placeholder="/cv/fajar-melfiano-2026.pdf"
+                  folder="cvs"
+                  accept="application/pdf"
                 />
               </Field>
             </FormSection>

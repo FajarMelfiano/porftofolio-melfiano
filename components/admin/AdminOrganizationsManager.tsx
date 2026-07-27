@@ -8,7 +8,7 @@ import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
   BilingualText, BilingualArea, BilingualListEditor,
-  useArmedDelete, DeleteConfirmBar
+  useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const emptyOrganization = (order: number): Omit<Organization, 'id'> => ({
@@ -134,12 +134,13 @@ export const AdminOrganizationsManager: React.FC = () => {
             </FormSection>
 
             <FormSection title="Bukti">
-              <Field label="URL Sertifikat / Bukti">
-                <TextInput
-                  value={form.certificateUrl ?? ''}
-                  onChange={v => set('certificateUrl', v)}
-                />
-              </Field>
+              <ImageUploader
+                label="File Sertifikat (Opsional)"
+                value={form.certificateUrl}
+                onChange={v => setForm({ ...form, certificateUrl: v })}
+                folder="organizations"
+                accept="*/*"
+              />
             </FormSection>
 
             <FormActions onCancel={() => setIsEditing(false)} saveLabel="Simpan Organisasi" />

@@ -7,7 +7,7 @@ import { Award } from 'lucide-react';
 import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput, Toggle,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
-  BilingualArea, TagsInput, useArmedDelete, DeleteConfirmBar
+  BilingualArea, TagsInput, useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const emptyCertificate = (order: number): Omit<Certificate, 'id'> => ({
@@ -68,10 +68,11 @@ export const AdminCertificatesManager: React.FC = () => {
     setIsEditing(false);
   };
 
+  const [now] = useState(() => Date.now());
+
   const sorted = [...certificates].sort((a, b) => a.order - b.order);
-  const now = useMemo(() => Date.now(), []);
   const isExpired = (c: Certificate) =>
-    Boolean(c.expiryDate) && new Date(c.expiryDate as string).getTime() < now;
+    Boolean(c.expiryDate) && now > 0 && new Date(c.expiryDate as string).getTime() < now;
 
   return (
     <div className="space-y-6">
@@ -140,17 +141,27 @@ export const AdminCertificatesManager: React.FC = () => {
                     placeholder="https://credly.com/..."
                   />
                 </Field>
-                <Field label="URL Berkas Sertifikat (PDF)">
-                  <TextInput value={form.fileUrl ?? ''} onChange={v => set('fileUrl', v)} />
-                </Field>
+                <ImageUploader
+                  label="File Asli (PDF/Image - Opsional)"
+                  value={form.fileUrl}
+                  onChange={v => setForm({ ...form, fileUrl: v })}
+                  folder="certificates"
+                  accept="*/*"
+                />
               </Grid>
               <Grid>
-                <Field label="URL Logo Penerbit">
-                  <TextInput value={form.issuerLogo ?? ''} onChange={v => set('issuerLogo', v)} />
-                </Field>
-                <Field label="URL Thumbnail Sertifikat">
-                  <TextInput value={form.thumbnailUrl} onChange={v => set('thumbnailUrl', v)} />
-                </Field>
+                <ImageUploader
+                  label="Logo Penerbit (Opsional)"
+                  value={form.issuerLogo}
+                  onChange={v => setForm({ ...form, issuerLogo: v })}
+                  folder="certificates"
+                />
+                <ImageUploader
+                  label="Thumbnail/Gambar Sertifikat"
+                  value={form.thumbnailUrl}
+                  onChange={v => setForm({ ...form, thumbnailUrl: v })}
+                  folder="certificates"
+                />
               </Grid>
             </FormSection>
 

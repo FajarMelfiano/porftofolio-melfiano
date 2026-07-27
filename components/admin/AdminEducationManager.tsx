@@ -8,7 +8,7 @@ import {
   PanelHeader, Card, AddButton, Field, TextInput, NumberInput,
   Grid, FormSection, FormActions, ItemRow, EmptyState,
   BilingualText, BilingualArea, BilingualListEditor,
-  useArmedDelete, DeleteConfirmBar
+  useArmedDelete, DeleteConfirmBar, ImageUploader
 } from './ui';
 
 const emptyEducation = (order: number): Omit<Education, 'id'> => ({
@@ -111,9 +111,11 @@ export const AdminEducationManager: React.FC = () => {
               </Grid>
               <Grid>
                 <Field label="URL Logo">
-                  <TextInput
+                  <ImageUploader
+                    label="Logo Institusi (Opsional)"
                     value={form.institutionLogo ?? ''}
                     onChange={v => set('institutionLogo', v)}
+                    folder="education"
                   />
                 </Field>
                 <Field label="Situs Institusi">

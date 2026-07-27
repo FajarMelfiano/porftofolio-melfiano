@@ -7,7 +7,7 @@ import { User, Save, Plus, Trash2 } from 'lucide-react';
 import {
   PanelHeader, Card, Field, TextInput, NumberInput, Select,
   Grid, FormSection, SavedBanner,
-  BilingualText, BilingualArea, BilingualListEditor, StringListEditor
+  BilingualText, BilingualArea, BilingualListEditor, StringListEditor, ImageUploader
 } from './ui';
 
 const AVAILABILITY = [
@@ -64,7 +64,12 @@ export const AdminProfileManager: React.FC = () => {
                   <TextInput required value={form.name} onChange={v => set('name', v)} />
                 </Field>
                 <Field label="URL Foto Profil">
-                  <TextInput value={form.avatarUrl} onChange={v => set('avatarUrl', v)} />
+                  <ImageUploader
+                    label="URL Foto Profil (Avatar)"
+                    value={form.avatarUrl}
+                    onChange={v => set('avatarUrl', v)}
+                    folder="profile"
+                  />
                 </Field>
               </Grid>
               {form.avatarUrl && (
