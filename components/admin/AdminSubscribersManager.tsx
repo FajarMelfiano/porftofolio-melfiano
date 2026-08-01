@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Mail, Download, UserCheck, UserX, Plus } from 'lucide-react';
 import {
@@ -9,6 +10,7 @@ import {
 } from './ui';
 
 export const AdminSubscribersManager: React.FC = () => {
+  const { success } = useToast();
   const { subscribers, addSubscriber, updateSubscriber, deleteSubscriber } = useDataContext();
 
   const [newEmail, setNewEmail] = useState('');

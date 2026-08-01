@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { ProfileInfo } from '@/lib/types';
 import { User, Save, Plus, Trash2 } from 'lucide-react';
 import {
   PanelHeader, Card, Field, TextInput, NumberInput, Select,
-  Grid, FormSection, SavedBanner,
-  BilingualText, BilingualArea, BilingualListEditor, StringListEditor, ImageUploader
+  Grid, FormSection, BilingualText, BilingualArea, BilingualListEditor, StringListEditor, ImageUploader
 } from './ui';
 
 const AVAILABILITY = [
@@ -17,13 +17,12 @@ const AVAILABILITY = [
 ] as const;
 
 export const AdminProfileManager: React.FC = () => {
+  const { success } = useToast();
   const { profile, updateProfile } = useDataContext();
 
   const [form, setForm] = useState<ProfileInfo>(profile);
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setForm(profile); }, [profile]);
-  const [saved, setSaved] = useState(false);
-  const set = <K extends keyof ProfileInfo>(k: K, v: ProfileInfo[K]) =>
+  useEffect(() => { setForm(profile); }, [profile]);  const set = <K extends keyof ProfileInfo>(k: K, v: ProfileInfo[K]) =>
     setForm(f => ({ ...f, [k]: v }));
 
   const handleSave = (e: React.FormEvent) => {
@@ -41,8 +40,8 @@ export const AdminProfileManager: React.FC = () => {
       hobbies: form.hobbies.filter(Boolean),
       languages: form.languages.filter(l => l.name.trim())
     });
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2000);
+    success('Perubahan berhasil disimpan!');
+    
   };
 
   return (
@@ -56,8 +55,7 @@ export const AdminProfileManager: React.FC = () => {
       <form onSubmit={handleSave} className="space-y-4">
         <Card>
           <div className="space-y-5 text-xs">
-            <SavedBanner show={saved} message="Profil berhasil disimpan!" />
-
+            
             <FormSection title="Identitas">
               <Grid>
                 <Field label="Nama Lengkap" required>

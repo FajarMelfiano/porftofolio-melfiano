@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { CVVersion } from '@/lib/types';
 import { FileText, Star, AlertTriangle } from 'lucide-react';
@@ -31,6 +32,7 @@ const emptyCV = (): Omit<CVVersion, 'id' | 'downloadCount'> => ({
 });
 
 export const AdminCVManager: React.FC = () => {
+  const { success } = useToast();
   const { cvVersions, addCVVersion, updateCVVersion, deleteCVVersion, setActiveCV } =
     useDataContext();
 
@@ -67,7 +69,8 @@ export const AdminCVManager: React.FC = () => {
     e.preventDefault();
     if (editingId) updateCVVersion(editingId, form);
     else addCVVersion(form);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   // The hero's download button falls back to the first entry, so an empty list

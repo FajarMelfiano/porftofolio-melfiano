@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Service } from '@/lib/types';
 import { Wrench, Plus, Trash2 } from 'lucide-react';
@@ -27,6 +28,7 @@ const emptyService = (order: number): Omit<Service, 'id'> => ({
 });
 
 export const AdminServicesManager: React.FC = () => {
+  const { success } = useToast();
   const { services, addService, updateService, deleteService } = useDataContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -75,7 +77,8 @@ export const AdminServicesManager: React.FC = () => {
     };
     if (editingId) updateService(editingId, payload);
     else addService(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const sorted = [...services].sort((a, b) => a.order - b.order);

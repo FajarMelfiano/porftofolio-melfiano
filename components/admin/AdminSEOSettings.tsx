@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { SEOSettings } from '@/lib/types';
 import { Search, Save, AlertTriangle } from 'lucide-react';
 import {
-  PanelHeader, Card, Field, TextInput, TextArea, Grid, FormSection, SavedBanner, ImageUploader
+  PanelHeader, Card, Field, TextInput, TextArea, Grid, FormSection, ImageUploader
 } from './ui';
 
 /** Google truncates around these lengths, so warn rather than hard-limit. */
@@ -13,20 +14,19 @@ const TITLE_MAX = 60;
 const DESC_MAX = 160;
 
 export const AdminSEOSettings: React.FC = () => {
+  const { success } = useToast();
   const { seoSettings, updateSEOSettings } = useDataContext();
 
   const [form, setForm] = useState<SEOSettings>(seoSettings);
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setForm(seoSettings); }, [seoSettings]);
-  const [saved, setSaved] = useState(false);
-  const set = <K extends keyof SEOSettings>(k: K, v: SEOSettings[K]) =>
+  useEffect(() => { setForm(seoSettings); }, [seoSettings]);  const set = <K extends keyof SEOSettings>(k: K, v: SEOSettings[K]) =>
     setForm(f => ({ ...f, [k]: v }));
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     updateSEOSettings(form);
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2000);
+    success('Perubahan berhasil disimpan!');
+    
   };
 
   const counter = (value: string, max: number) => (
@@ -47,8 +47,7 @@ export const AdminSEOSettings: React.FC = () => {
       <form onSubmit={handleSave} className="space-y-4">
         <Card>
           <div className="space-y-5 text-xs">
-            <SavedBanner show={saved} message="Pengaturan SEO berhasil diperbarui!" />
-
+            
             <FormSection title="Metadata Dasar">
               <Field label="Judul Halaman (Meta Title)" required>
                 <TextInput required value={form.metaTitle} onChange={v => set('metaTitle', v)} />

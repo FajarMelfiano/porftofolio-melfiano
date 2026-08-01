@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { ContactMessage } from '@/lib/types';
 import { Mail, CheckCircle2, Archive, Trash2, Reply, Search, Download } from 'lucide-react';
@@ -17,6 +18,7 @@ const STATUS_TONE: Record<ContactMessage['status'], string> = {
 };
 
 export const AdminMessagesManager: React.FC = () => {
+  const { success } = useToast();
   const { messages, updateMessageStatus, deleteMessage } = useDataContext();
 
   const [filter, setFilter] = useState<'All' | ContactMessage['status']>('All');

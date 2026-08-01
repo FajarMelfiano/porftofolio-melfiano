@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Education } from '@/lib/types';
 import { GraduationCap } from 'lucide-react';
@@ -29,6 +30,7 @@ const emptyEducation = (order: number): Omit<Education, 'id'> => ({
 });
 
 export const AdminEducationManager: React.FC = () => {
+  const { success } = useToast();
   const { educations, addEducation, updateEducation, deleteEducation } = useDataContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -75,7 +77,8 @@ export const AdminEducationManager: React.FC = () => {
     };
     if (editingId) updateEducation(editingId, payload);
     else addEducation(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const sorted = [...educations].sort((a, b) => a.order - b.order);

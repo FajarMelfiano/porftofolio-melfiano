@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Experience } from '@/lib/types';
 import { Briefcase } from 'lucide-react';
@@ -38,6 +39,7 @@ const emptyExperience = (order: number): Omit<Experience, 'id'> => ({
 });
 
 export const AdminExperienceManager: React.FC = () => {
+  const { success } = useToast();
   const { experiences, addExperience, updateExperience, deleteExperience } = useDataContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -84,7 +86,8 @@ export const AdminExperienceManager: React.FC = () => {
     };
     if (editingId) updateExperience(editingId, payload);
     else addExperience(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const sorted = [...experiences].sort((a, b) => a.order - b.order);

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Publication } from '@/lib/types';
 import { BookOpen } from 'lucide-react';
@@ -37,6 +38,7 @@ const emptyPublication = (order: number): Omit<Publication, 'id'> => ({
 });
 
 export const AdminPublicationsManager: React.FC = () => {
+  const { success } = useToast();
   const { publications, addPublication, updatePublication, deletePublication } = useDataContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -76,7 +78,8 @@ export const AdminPublicationsManager: React.FC = () => {
     };
     if (editingId) updatePublication(editingId, payload);
     else addPublication(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const sorted = [...publications].sort((a, b) => a.order - b.order);

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Organization } from '@/lib/types';
 import { Users } from 'lucide-react';
@@ -24,6 +25,7 @@ const emptyOrganization = (order: number): Omit<Organization, 'id'> => ({
 });
 
 export const AdminOrganizationsManager: React.FC = () => {
+  const { success } = useToast();
   const { organizations, addOrganization, updateOrganization, deleteOrganization } =
     useDataContext();
 
@@ -63,7 +65,8 @@ export const AdminOrganizationsManager: React.FC = () => {
     };
     if (editingId) updateOrganization(editingId, payload);
     else addOrganization(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const sorted = [...organizations].sort((a, b) => a.order - b.order);

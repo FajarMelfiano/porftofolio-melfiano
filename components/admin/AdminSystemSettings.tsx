@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { SystemSettings } from '@/lib/types';
 import { Settings, Save, Download, Upload, AlertTriangle, RotateCcw } from 'lucide-react';
 import {
   PanelHeader, Card, Field, TextInput, TextArea, Select, Toggle,
-  Grid, FormSection, SavedBanner
-} from './ui';
+  Grid, FormSection, } from './ui';
 
 const LANGUAGES = [
   { value: 'id', label: 'Bahasa Indonesia' },
@@ -15,6 +15,7 @@ const LANGUAGES = [
 ] as const;
 
 export const AdminSystemSettings: React.FC = () => {
+  const { success } = useToast();
   const {
     systemSettings, updateSystemSettings,
     exportDatabaseJSON, importDatabaseJSON, resetToDefaultData
@@ -22,9 +23,7 @@ export const AdminSystemSettings: React.FC = () => {
 
   const [form, setForm] = useState<SystemSettings>(systemSettings);
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setForm(systemSettings); }, [systemSettings]);
-  const [saved, setSaved] = useState(false);
-  const [notice, setNotice] = useState<{ tone: 'ok' | 'err'; text: string } | null>(null);
+  useEffect(() => { setForm(systemSettings); }, [systemSettings]);  const [notice, setNotice] = useState<{ tone: 'ok' | 'err'; text: string } | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
 
   const set = <K extends keyof SystemSettings>(k: K, v: SystemSettings[K]) =>
@@ -33,8 +32,8 @@ export const AdminSystemSettings: React.FC = () => {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     updateSystemSettings(form);
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2000);
+    success('Perubahan berhasil disimpan!');
+    
   };
 
   const handleExport = () => {
@@ -77,8 +76,7 @@ export const AdminSystemSettings: React.FC = () => {
       <form onSubmit={handleSave} className="space-y-4">
         <Card>
           <div className="space-y-5 text-xs">
-            <SavedBanner show={saved} message="Konfigurasi sistem berhasil diperbarui!" />
-
+            
             <FormSection title="Akses Admin">
               <Field
                 label="Rute Admin"

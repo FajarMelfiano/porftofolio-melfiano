@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Achievement } from '@/lib/types';
 import { Trophy } from 'lucide-react';
@@ -33,6 +34,7 @@ const emptyAchievement = (order: number): Omit<Achievement, 'id'> => ({
 });
 
 export const AdminAchievementsManager: React.FC = () => {
+  const { success } = useToast();
   const { achievements, addAchievement, updateAchievement, deleteAchievement } = useDataContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -70,7 +72,8 @@ export const AdminAchievementsManager: React.FC = () => {
     };
     if (editingId) updateAchievement(editingId, payload);
     else addAchievement(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const sorted = [...achievements].sort((a, b) => a.order - b.order);

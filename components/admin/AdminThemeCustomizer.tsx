@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { ThemeSettings } from '@/lib/types';
 import { Palette } from 'lucide-react';
 
 export const AdminThemeCustomizer: React.FC = () => {
+  const { success } = useToast();
   const { themeSettings, updateThemeSettings } = useDataContext();
 
   return (

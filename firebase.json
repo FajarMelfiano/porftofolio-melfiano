@@ -1,0 +1,8 @@
+{
+  "firestore": {
+    "database": "ai-studio-personalportfoli-311fb411-1ce8-4578-a084-1aac99d5724a",
+    "location": "nam5",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

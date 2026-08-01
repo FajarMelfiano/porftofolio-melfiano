@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Training } from '@/lib/types';
 import { BookMarked } from 'lucide-react';
@@ -24,6 +25,7 @@ const emptyTraining = (order: number): Omit<Training, 'id'> => ({
 });
 
 export const AdminTrainingsManager: React.FC = () => {
+  const { success } = useToast();
   const { trainings, addTraining, updateTraining, deleteTraining } = useDataContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -51,7 +53,8 @@ export const AdminTrainingsManager: React.FC = () => {
     e.preventDefault();
     if (editingId) updateTraining(editingId, form);
     else addTraining(form);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const sorted = [...trainings].sort((a, b) => a.order - b.order);

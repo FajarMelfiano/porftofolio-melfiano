@@ -1,10 +1,21 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
+import { PwaRegistry } from '@/components/PwaRegistry';
 import './globals.css';
+
+export const viewport: Viewport = {
+  themeColor: '#0f0f0f',
+};
 
 export const metadata: Metadata = {
   title: 'Fajar Melfiano | Pelajar SMK & Cloud Computing Enthusiast',
   description:
     'Portofolio Fajar Melfiano Obese Afoan Toan — pelajar SMK Krian 1 Sidoarjo yang menekuni Linux, otomasi, pengembangan web, dan cloud computing.',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Melfiano',
+  },
 };
 
 // Applies the saved theme before first paint. Without this the page renders in
@@ -41,6 +52,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="bg-canvas text-fg antialiased selection:bg-fg selection:text-canvas font-sans min-h-screen"
         suppressHydrationWarning
       >
+        <PwaRegistry />
         {children}
       </body>
     </html>

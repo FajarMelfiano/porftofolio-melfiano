@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Wrench } from 'lucide-react';
 import { DataProvider, useDataContext } from '@/lib/data-context';
+import { ToastProvider } from '@/lib/toast-context';
 import { Navbar } from '@/components/public/Navbar';
 import { HeroSection } from '@/components/public/HeroSection';
 import { AboutSection } from '@/components/public/AboutSection';
@@ -135,9 +136,11 @@ function PortfolioAppContent() {
 
 export default function Home() {
   return (
-    <DataProvider>
+    <ToastProvider>
+      <DataProvider>
       <SiteSettings />
       <PortfolioAppContent />
-    </DataProvider>
+      </DataProvider>
+    </ToastProvider>
   );
 }

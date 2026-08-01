@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { GalleryItem } from '@/lib/types';
 import { Image as ImageIcon } from 'lucide-react';
@@ -33,6 +34,7 @@ const emptyItem = (): Omit<GalleryItem, 'id'> => ({
 });
 
 export const AdminGalleryManager: React.FC = () => {
+  const { success } = useToast();
   const { gallery, addGalleryItem, updateGalleryItem, deleteGalleryItem } = useDataContext();
 
   const [filter, setFilter] = useState<string>('all');
@@ -66,7 +68,8 @@ export const AdminGalleryManager: React.FC = () => {
     };
     if (editingId) updateGalleryItem(editingId, payload);
     else addGalleryItem(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const visible = filter === 'all' ? gallery : gallery.filter(g => g.category === filter);

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { UserCircle } from 'lucide-react';
 import { updatePassword, updateEmail, updateProfile, User } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
@@ -12,10 +13,10 @@ import {
   Field,
   TextInput,
   FormActions,
-  SavedBanner,
-} from './ui';
+  } from './ui';
 
 export function AdminUserManager() {
+  const { success, error: toastError } = useToast();
   const { adminUser } = useDataContext();
 
   // Profile states
@@ -182,8 +183,7 @@ export function AdminUserManager() {
               >
                 {isSavingProfile ? 'Menyimpan...' : 'Simpan Profil'}
               </button>
-              <SavedBanner show={profileMessage?.type === 'ok'} message={profileMessage?.text} />
-            </div>
+                          </div>
           </form>
         </Card>
 
@@ -226,8 +226,7 @@ export function AdminUserManager() {
               >
                 {isSavingPassword ? 'Menyimpan...' : 'Ubah Password'}
               </button>
-              <SavedBanner show={passwordMessage?.type === 'ok'} message={passwordMessage?.text} />
-            </div>
+                          </div>
           </form>
         </Card>
 

@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Layers, Eye, EyeOff, ArrowUp, ArrowDown } from 'lucide-react';
 
 export const AdminPageBuilder: React.FC = () => {
+  const { success } = useToast();
   const { pageSections, updatePageSections } = useDataContext();
 
   const handleToggle = (id: string) => {

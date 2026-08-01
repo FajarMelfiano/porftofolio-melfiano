@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { BlogPost } from '@/lib/types';
 import { BookOpen, Eye, Heart } from 'lucide-react';
@@ -34,6 +35,7 @@ const emptyPost = (): BlogForm => ({
 });
 
 export const AdminBlogManager: React.FC = () => {
+  const { success } = useToast();
   const { blogPosts, addBlogPost, updateBlogPost, deleteBlogPost } = useDataContext();
 
   const [filter, setFilter] = useState<'all' | 'published' | 'draft'>('all');
@@ -85,7 +87,8 @@ export const AdminBlogManager: React.FC = () => {
     };
     if (editingId) updateBlogPost(editingId, payload);
     else addBlogPost(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const visible = blogPosts.filter(p =>

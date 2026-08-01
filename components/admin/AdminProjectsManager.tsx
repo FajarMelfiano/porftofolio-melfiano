@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Project } from '@/lib/types';
 import { Folder, Eye } from 'lucide-react';
@@ -55,6 +56,7 @@ const orUndefined = (v: { id: string; en: string }) =>
   v.id.trim() ? { id: v.id, en: v.en || v.id } : undefined;
 
 export const AdminProjectsManager: React.FC = () => {
+  const { success } = useToast();
   const { projects, addProject, updateProject, deleteProject } = useDataContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -137,7 +139,8 @@ export const AdminProjectsManager: React.FC = () => {
     };
     if (editingId) updateProject(editingId, payload);
     else addProject(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const sorted = [...projects].sort((a, b) => a.order - b.order);

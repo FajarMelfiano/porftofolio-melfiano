@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Certificate } from '@/lib/types';
 import { Award } from 'lucide-react';
@@ -29,6 +30,7 @@ const emptyCertificate = (order: number): Omit<Certificate, 'id'> => ({
 });
 
 export const AdminCertificatesManager: React.FC = () => {
+  const { success } = useToast();
   const { certificates, addCertificate, updateCertificate, deleteCertificate } = useDataContext();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -65,7 +67,8 @@ export const AdminCertificatesManager: React.FC = () => {
     };
     if (editingId) updateCertificate(editingId, payload);
     else addCertificate(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const [now] = useState(() => Date.now());

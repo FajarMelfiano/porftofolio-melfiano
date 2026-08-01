@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Skill, SkillCategory } from '@/lib/types';
 import { Code2, Layers, Star } from 'lucide-react';
@@ -34,6 +35,7 @@ const emptySkill = (order: number, categoryId: string): Omit<Skill, 'id'> => ({
 });
 
 export const AdminSkillsManager: React.FC = () => {
+  const { success } = useToast();
   const {
     skills, skillCategories,
     addSkill, updateSkill, deleteSkill,
@@ -80,7 +82,8 @@ export const AdminSkillsManager: React.FC = () => {
     const payload = { ...form, description: { id: form.description?.id ?? '', en: form.description?.en || form.description?.id || '' } };
     if (editingId) updateSkill(editingId, payload);
     else addSkill(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const saveCategory = (e: React.FormEvent) => {
@@ -88,7 +91,8 @@ export const AdminSkillsManager: React.FC = () => {
     const payload = { ...catForm, name: { id: catForm.name.id, en: catForm.name.en || catForm.name.id } };
     if (catEditingId) updateSkillCategory(catEditingId, payload);
     else addSkillCategory(payload);
-    setCatEditingId(null);
+    success('Data berhasil disimpan!');
+      setCatEditingId(null);
     setCatForm({ name: { id: '', en: '' }, icon: 'Layers' });
   };
 

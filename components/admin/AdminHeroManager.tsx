@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { HeroConfig } from '@/lib/types';
 import { Sparkles, Save } from 'lucide-react';
 import {
   PanelHeader, Card, Field, Select, Toggle, Grid, FormSection,
-  BilingualText, BilingualArea, SavedBanner
-} from './ui';
+  BilingualText, BilingualArea, } from './ui';
 
 const LAYOUTS = [
   { value: 'classic', label: 'Classic' },
@@ -24,13 +24,12 @@ const BACKGROUNDS = [
 ] as const;
 
 export const AdminHeroManager: React.FC = () => {
+  const { success } = useToast();
   const { heroConfig, updateHeroConfig } = useDataContext();
 
   const [form, setForm] = useState<HeroConfig>(heroConfig);
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setForm(heroConfig); }, [heroConfig]);
-  const [saved, setSaved] = useState(false);
-  const set = <K extends keyof HeroConfig>(k: K, v: HeroConfig[K]) =>
+  useEffect(() => { setForm(heroConfig); }, [heroConfig]);  const set = <K extends keyof HeroConfig>(k: K, v: HeroConfig[K]) =>
     setForm(f => ({ ...f, [k]: v }));
 
   const save = (e: React.FormEvent) => {
@@ -49,8 +48,8 @@ export const AdminHeroManager: React.FC = () => {
         en: form.secondaryCtaText.en || form.secondaryCtaText.id
       }
     });
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2000);
+    success('Perubahan berhasil disimpan!');
+    
   };
 
   return (
@@ -63,8 +62,7 @@ export const AdminHeroManager: React.FC = () => {
 
       <Card>
         <form onSubmit={save} className="space-y-5 text-xs">
-          <SavedBanner show={saved} message="Hero banner berhasil diperbarui!" />
-
+          
           <FormSection title="Teks Utama">
             <BilingualText
               label="Sapaan"

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useToast } from '@/lib/toast-context';
 import { useDataContext } from '@/lib/data-context';
 import { Testimonial } from '@/lib/types';
 import { MessageSquare, Check, Star } from 'lucide-react';
@@ -23,6 +24,7 @@ const emptyTestimonial = (order: number): Omit<Testimonial, 'id' | 'isApproved'>
 });
 
 export const AdminTestimonialsManager: React.FC = () => {
+  const { success } = useToast();
   const {
     testimonials, addTestimonial, updateTestimonial, deleteTestimonial, approveTestimonial
   } = useDataContext();
@@ -70,7 +72,8 @@ export const AdminTestimonialsManager: React.FC = () => {
     // New testimonials start unapproved so nothing reaches the public site
     // without a deliberate approval step.
     else addTestimonial(payload);
-    setIsEditing(false);
+    success('Data berhasil disimpan!');
+      setIsEditing(false);
   };
 
   const visible = testimonials.filter(t =>
